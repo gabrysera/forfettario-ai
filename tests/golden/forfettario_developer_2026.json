@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "description": "Synthetic Italian software developer with a simple supported 2026 forfettario profile.",
+  "access_facts": {
+    "previous_year_revenue": "0",
+    "previous_year_labor_costs": "0",
+    "uses_special_vat_or_income_regime": false,
+    "italian_tax_resident": true,
+    "prevalently_sells_real_estate_land_or_new_vehicles": false,
+    "participates_in_partnership_association_or_family_business": false,
+    "controls_related_limited_company": false,
+    "works_prevalently_for_current_or_recent_employer": false,
+    "previous_year_employment_income": "0",
+    "employment_relationship_ended": false
+  },
+  "startup_facts": {
+    "professional_business_activity_in_previous_three_years": false,
+    "mere_continuation_of_previous_employment_or_self_employment": false,
+    "continues_activity_previously_run_by_another_person": false,
+    "predecessor_previous_year_revenue": null
+  },
+  "expected": {
+    "forfettario_access": true,
+    "startup_rate": true
+  }
+}
