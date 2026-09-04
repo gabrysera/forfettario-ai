@@ -80,19 +80,24 @@ Not initially supported:
 4. Unsupported cases fail closed into review instead of guessing.
 5. No production use until the relevant rules have been independently reviewed.
 
-## Suggested stack
+## Stack
 
-- TypeScript
-- Next.js
+Keep v0 deliberately boring and Python-first:
+
+- Python 3.13+
+- FastAPI
+- Jinja2 server-rendered templates
+- HTMX for small interactive updates
+- minimal vanilla CSS (no frontend build system initially)
 - PostgreSQL
-- Drizzle ORM
-- Tailwind + shadcn/ui
-- Vitest
-- Playwright
+- SQLAlchemy 2 + Alembic
+- Pydantic 2
+- pytest
+- Playwright for Python
 - GitHub Actions
 - OpenAI API for orchestration/extraction/explanations
 
-The stack is intentionally provisional until the first vertical slice is fully specified.
+There is intentionally **no React/Next.js SPA and no Node build step** in the initial architecture. The browser receives HTML from the same Python application.
 
 ## First milestone
 
