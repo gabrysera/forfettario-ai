@@ -36,7 +36,9 @@ class StartupRateFacts(BaseModel):
 def assess_forfettario_access(facts: ForfettarioFacts) -> Assessment:
     return Assessment(
         conditions=(
-            _max_amount("FORF-ACCESS-001", facts.previous_year_revenue, REVENUE_LIMIT, "LAW190-C54"),
+            _max_amount(
+                "FORF-ACCESS-001", facts.previous_year_revenue, REVENUE_LIMIT, "LAW190-C54"
+            ),
             _max_amount(
                 "FORF-ACCESS-002",
                 facts.previous_year_labor_costs,
