@@ -9,7 +9,7 @@ from app.tax_engine.forfettario_2026 import (
     assess_forfettario_access,
     assess_startup_rate,
 )
-from app.tax_engine.types import ConditionStatus
+from app.tax_engine.types import Assessment, ConditionStatus
 
 
 @pytest.mark.parametrize(
@@ -106,6 +106,7 @@ def _eligible_facts(**overrides: object) -> ForfettarioFacts:
     return ForfettarioFacts.model_validate(values)
 
 
-def _status(assessment: object, condition_id: str) -> ConditionStatus:
-    conditions = getattr(assessment, "conditions")
-    return next(condition.status for condition in conditions if condition.condition_id == condition_id)
+def _status(assessment: Assessment, condition_id: str) -> ConditionStatus:
+    return next(
+        condition.status for condition in assessment.conditions if condition.condition_id == condition_id
+    )
