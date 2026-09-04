@@ -108,5 +108,7 @@ def _eligible_facts(**overrides: object) -> ForfettarioFacts:
 
 def _status(assessment: Assessment, condition_id: str) -> ConditionStatus:
     return next(
-        condition.status for condition in assessment.conditions if condition.condition_id == condition_id
+        condition.status
+        for condition in assessment.conditions
+        if condition.condition_id == condition_id
     )
