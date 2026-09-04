@@ -1,274 +1,266 @@
 # AA9/12 opening workflow — v0 research map
 
-Status: **research in progress**. This document is intentionally stricter than the form itself: unresolved consequential fields remain unresolved rather than being guessed.
+Status: **research in progress**.
 
-## Scope
+This document covers only the first supported opening path and must be derived from Agenzia delle Entrate material. A field being visible on the paper form does **not** by itself prove that it is mandatory in every electronic opening.
 
-This mapping covers only the first supported archetype:
+## Source hierarchy
+
+Use sources in this order:
+
+1. current Agenzia delle Entrate product/model page;
+2. current AA9/12 model and official instructions;
+3. Agenzia provvedimenti and technical transmission specifications;
+4. Agenzia compilation/control software behavior or release notes;
+5. legislation referenced by the above material.
+
+Third-party articles may help locate an official source but must never determine a production rule.
+
+Current confirmed official baseline:
+
+- AA9/12 is the form for VAT start/change/cessation by individual businesses and self-employed people;
+- Provvedimento 3 June 2015 no. 75295 approved AA9/12 and its electronic transmission specifications;
+- Agenzia's telematic-software notice confirms that the forfettario regime can be selected and, when selected, presumed turnover must not be entered;
+- the official instructions currently available in the repository/library are the 2024 revision.
+
+Before v0 production use, verify that no later Agenzia instruction/specification changes the fields used by our supported path.
+
+## Supported archetype
+
+The mapping is deliberately narrow:
 
 - natural person;
 - Italian tax resident;
 - first VAT position;
-- self-employed professional / software developer;
+- self-employed software developer;
 - one prevalent activity;
-- ATECO 2025 `62.10.00` after explicit activity confirmation;
-- candidate for regime forfettario;
+- ATECO 2025 `62.10.00` after explicit confirmation;
+- regime forfettario candidate;
 - no representative;
-- no extraordinary business operation;
-- no second activity or second place of business;
+- no extraordinary operation;
+- no second VAT-relevant activity;
+- no additional business location;
 - no external accounting-record depositary;
-- direct submission by the taxpayer, not by this application as an authorized intermediary.
+- direct filing by the taxpayer, not filing by this application as an authorized intermediary.
 
-Anything outside these assumptions must not be forced through this mapping.
+A fact outside this boundary produces review/unsupported status instead of an invented default.
 
-## Sources reviewed
+## Field-state vocabulary
 
-Primary/authoritative sources:
+Every field has one explicit state:
 
-1. Agenzia delle Entrate, **Modello AA9/12**.
-2. Agenzia delle Entrate, **AA9/12 — Istruzioni per la compilazione (2024 revision)**.
-3. Agenzia delle Entrate, Provvedimento 21 December 2006, art. 35(15-ter) implementation, published in G.U. Serie Generale n. 3, 4 January 2007.
-4. Agenzia delle Entrate, Provvedimento 14 January 2008, update of activity codes requiring additional Quadro I activity information.
-5. ISTAT, ATECO 2025 / 2026 technical documentation and correspondence tables.
+- `USER_INPUT` — user supplies or confirms the fact;
+- `DERIVED` — mechanically derived from confirmed data;
+- `DETERMINISTIC_RULE` — populated from a sourced rule;
+- `CONDITIONAL` — requested only if a sourced condition is true;
+- `NOT_APPLICABLE` — proven irrelevant to this supported case;
+- `NEEDS_RESEARCH` — requiredness/meaning not sufficiently verified;
+- `UNSUPPORTED` — legitimate case intentionally outside v0.
 
-Page references below refer to the 2024 AA9/12 instructions unless otherwise noted.
-
-## Field-origin vocabulary
-
-Every eventual internal AA9/12 field should have one explicit origin:
-
-- `USER_INPUT`: the user must supply or confirm the fact.
-- `DERIVED`: mechanically derived from already confirmed data.
-- `DETERMINISTIC_RULE`: filled from a sourced deterministic rule.
-- `CONDITIONAL`: required only when a sourced condition is true.
-- `NOT_APPLICABLE`: proven not applicable to the supported case.
-- `NEEDS_RESEARCH`: source/requiredness is not yet resolved.
-- `UNSUPPORTED`: valid tax situation, but outside v0.
-
-`NOT_APPLICABLE` must never mean "the AI assumed no".
+`NOT_APPLICABLE` must never mean "the model assumed no".
 
 ## Global form rules
 
-| Field / rule | Origin | v0 behavior | Source |
-| --- | --- | --- | --- |
-| Taxpayer fiscal code at top of each page | `DERIVED` | Copy confirmed taxpayer fiscal code to every generated form page | Instructions p.1 |
-| Page number | `DERIVED` | Generate progressively | Instructions p.1 |
-| Total pages | `DERIVED` | Generate from actual completed form packet | Instructions p.1 / signature section |
-| Date formatting | `DERIVED` | DD/MM/YYYY in rendered form | Instructions p.1 |
-| Full addresses / no abbreviations | `USER_INPUT` + validation | Normalize only presentation; never invent missing address parts | Instructions p.1 |
-| Filing deadline | `DETERMINISTIC_RULE` | Opening declaration is due within 30 days of actual activity start | Instructions p.1 |
-| Start date later than presentation date | invalid | Reject before export | Instructions p.3 |
+| Field / rule | State | v0 behavior |
+| --- | --- | --- |
+| taxpayer fiscal code on form pages | `DERIVED` | copy validated fiscal code |
+| page number / total pages | `DERIVED` | calculate from rendered packet |
+| dates | `DERIVED` presentation | render in official form format |
+| addresses | `USER_INPUT` | validate; never invent missing components |
+| opening declaration timing | `DETERMINISTIC_RULE` | validate against official 30-day filing rule |
+| future start date relative to filing | invalid | reject before export |
 
-## Quadro A — Tipo di dichiarazione
+## Quadro A — declaration type
 
-For the v0 opening path only.
+For first opening:
 
-| Field | Origin | v0 value / behavior | Notes |
-| --- | --- | --- | --- |
-| `declaration_type` | `DETERMINISTIC_RULE` | `1` — inizio attività | First VAT position / new activity |
-| `start_date` | `USER_INPUT` | Required, explicit confirmation | Must be <= presentation date; filing window checked separately |
-| VAT number | `NOT_APPLICABLE` | Blank | Not assigned yet on first opening |
-| variation / cessation fields | `NOT_APPLICABLE` | Blank | Different workflow |
+| Field | State | Value / behavior |
+| --- | --- | --- |
+| declaration type | `DETERMINISTIC_RULE` | `1` — start of activity |
+| activity start date | `USER_INPUT` | explicit factual date; never tax-optimized by AI |
+| VAT number | `NOT_APPLICABLE` | blank before attribution |
+| variation/cessation | `NOT_APPLICABLE` | separate workflows |
 
-The product must explain that `start_date` is a legal/factual date, not a date chosen by the AI to optimize the filing.
-
-## Quadro B — Soggetto d'imposta
+## Quadro B — taxpayer and prevalent activity
 
 ### Identity
 
-| Field | Origin | v0 behavior |
+- legal name: confirmed user identity, no invented abbreviations;
+- nonresident address/foreign VAT id: `NOT_APPLICABLE` for v0 Italian-resident path.
+
+### Activity
+
+| Field | State | v0 behavior |
 | --- | --- | --- |
-| Ditta / cognome e nome | `USER_INPUT` / `DERIVED` | Use confirmed legal identity; do not abbreviate |
-| Non-resident foreign address | `NOT_APPLICABLE` | Blank for the supported Italian-resident path |
-| Foreign VAT identification number | `NOT_APPLICABLE` | Blank |
+| activity code | `DERIVED` after confirmation | current ATECO code at filing; target `62.10.00` |
+| activity description | `DERIVED` | official description corresponding to code |
+| presumed turnover | `DETERMINISTIC_RULE` | blank for a taxpayer choosing forfettario |
+| art. 60-bis intra-EU goods checkbox | `CONDITIONAL` | separate from VIES; ask only if relevant |
+| activity/studio address | `USER_INPUT` | confirm where the professional ordinarily exercises the activity |
+| accounting-records checkbox | `CONDITIONAL` | based on actual record-storage facts |
+| subsidized tax regime | `DETERMINISTIC_RULE` after eligibility + intent | code `2` for forfettario |
 
-### Prevalent activity and place of business
+### What "studio / activity address" means for our user
 
-| Field | Origin | v0 behavior | Source note |
-| --- | --- | --- | --- |
-| Activity code | `DERIVED` after confirmation | ATECO current at submission; v0 target is ATECO 2025 `62.10.00` | Instructions p.3 requires classification current at filing |
-| Activity description | `DERIVED` | Official description corresponding to the confirmed code | Instructions p.4 |
-| Presumed turnover | `DETERMINISTIC_RULE` | **Blank** when the taxpayer intends to use regime forfettario | Instructions pp.4–5 |
-| Art. 60-bis intra-EU goods checkbox | `CONDITIONAL` | Ask only if facts can make it relevant; do not conflate with VIES | Instructions p.4 |
-| Studio / activity address | `USER_INPUT` | Required confirmation; never assume it equals residence | Instructions p.4 |
-| "Scritture contabili" checkbox | `CONDITIONAL` | Requires explicit storage-place fact; exact v0 UX still to specify | Instructions p.4 |
-| Regime fiscale agevolato | `DETERMINISTIC_RULE` after eligibility + user intent | Value `2` for regime forfettario | Instructions p.4 |
+The regime forfettario does **not** require the taxpayer to own or rent a separate office.
+
+For a software developer working from home, the home can be the place where the professional activity is exercised. The UI should therefore ask a human question such as:
+
+> Where do you normally carry out your freelance activity?
+> - my home
+> - a separate office/studio
+> - coworking/other place
+> - I do not have one stable place
+
+The answer is then mapped deterministically to the form/review flow. Never tell a user they need to acquire an office or property merely because AA9/12 contains address/property fields.
 
 ### Electronic commerce
 
-The section is filled only if the subject **exercises electronic commerce**. Having a website, GitHub profile, portfolio, or remote software-development business is not by itself a reason to fill it.
+Remote software development, having a website, GitHub profile or portfolio is not by itself electronic commerce for this form section.
 
-For v0:
+- explicit supported `does_ecommerce = false` -> blank;
+- true/ambiguous -> collect the dedicated facts or require review until that path is specified.
 
-- explicit `does_ecommerce = false` -> `NOT_APPLICABLE`;
-- true / ambiguous -> collect the required facts or return `PROFESSIONAL_REVIEW_REQUIRED` until that path is specified.
+## Quadro C — holder
 
-## Quadro C — Titolare
+Collect/validate:
 
-| Field | Origin | v0 behavior |
+- fiscal code;
+- legal name;
+- birth date;
+- birth municipality/state and province where applicable;
+- anagraphic residence;
+- fiscal domicile when legally different.
+
+For the ordinary Italian resident path, residence and fiscal-domicile municipality generally align under the rule cited by the official instructions. If the user has an exceptional fiscal domicile established under art. 59, v0 escalates instead of silently copying residence.
+
+## Quadri D–H — explicit v0 gates
+
+These sections are not "ignored"; their triggering conditions are checked.
+
+| Quadro | Trigger | v0 |
 | --- | --- | --- |
-| Fiscal code | `USER_INPUT` / validated | Required |
-| Surname / given name | `USER_INPUT` | Required in profile; form may omit duplicate names where permitted, but internal model keeps them |
-| Date of birth | `USER_INPUT` | Required |
-| Municipality / foreign state of birth | `USER_INPUT` | Required |
-| Province of birth | `USER_INPUT` / conditional | Required where applicable |
-| Residence / fiscal domicile address | `USER_INPUT` | Required |
-| CAP / municipality / province | `USER_INPUT` | Required |
-| "Scritture contabili" checkbox | `CONDITIONAL` | Based on where records are actually kept |
+| D — representative | representative/heir/judicial/fiscal representative | `UNSUPPORTED` / review |
+| E — extraordinary operations | acquisition, donation, succession, business lease, transformation | `UNSUPPORTED` / review |
+| F — accounting records | external depositary/additional or foreign storage places | simple self-held path only; otherwise review |
+| G — other activities/locations | multiple VAT activities or other places | `UNSUPPORTED` initially |
+| H — special representation relationship | goods-representation case under cited rule | `UNSUPPORTED` |
 
-For an Italian resident person, the instructions state that fiscal domicile is in the municipality of anagraphic residence, subject to the special art. 59 exception. v0 must explicitly ask whether a different fiscal domicile has been established by the tax administration; if yes, escalate rather than silently copying residence.
+## Quadro I — opening-only information
 
-## Quadri D, E, F, G, H — v0 boundary
+The official instructions contain Quadro I for start-of-activity information. We must model its possible fields, but **must not treat every visible field as universally mandatory**.
 
-These are **not globally irrelevant**. They are blank only because the first supported archetype proves their triggering facts absent.
+### Contact fields
 
-| Quadro | Trigger examples | v0 behavior |
-| --- | --- | --- |
-| D — representative | representative different from taxpayer, heir, insolvency/judicial roles, fiscal representative | `UNSUPPORTED` / review |
-| E — extraordinary operations | business acquisition/donation, succession, lease of business, transformations | `UNSUPPORTED` / review |
-| F — accounting records | external depositary / additional record-storage places / foreign electronic invoice storage | v0 supports only simple self-held case; otherwise review |
-| G — other activities / locations | multiple VAT-relevant activities or additional places | `UNSUPPORTED` initially |
-| H — presumption of transfer / representation relationship | special goods representation relationship | `UNSUPPORTED` |
+Potential fields:
 
-This boundary should become deterministic onboarding gates, not hidden assumptions.
+- email;
+- telephone;
+- fax;
+- website distinct from an e-commerce site already reported in Quadro B.
 
-## Quadro I — Altre informazioni in sede di inizio attività
+Exact mandatory/optional validation status follows the official technical specification/control behavior, not UI guesswork.
 
-**Important:** Quadro I is part of the opening workflow. It is not an optional "advanced" form page merely because the taxpayer is a simple professional.
+### Property / cadastral fields — current status
 
-The 21 December 2006 provision introduced additional information for VAT openings. The 2024 instructions dedicate Quadro I to these opening-only facts.
+Official instructions describe data relating to the property used for the prevalent activity, including possession/detention, cadastral identifiers and, for lease/free-loan cases, registration details.
 
-### Contact information
+This does **not** imply that every single home-based forfettario programmer must always be asked for all cadastral fields.
 
-Collect explicitly:
+Until issue #8 verifies the current AA9/12 transmission/control specification, v0 classifies these fields as:
 
-- email address;
-- telephone number;
-- fax number, if any;
-- website, if any and distinct from an e-commerce website already declared in Quadro B.
+`NEEDS_RESEARCH -> CONDITIONAL`
 
-Do not fabricate empty-but-plausible values. The 2006 provision states that omission of these additional pieces of information is an element for audit-selection purposes rather than a separate rejection rule; the application should nevertheless request the applicable information cleanly.
+not `REQUIRED_FOR_V0`.
 
-### Property used for the prevalent activity
+Required UX principle:
 
-The opening packet must model:
+1. first establish the actual place-of-activity fact;
+2. determine from official validation rules whether property information is required for that fact pattern;
+3. reveal only the required fields;
+4. if official requiredness remains unresolved, block final export/filing guidance rather than guessing.
 
-- property title: `P` possession or `D` detention;
-- cadastral type: `F` building or `T` land;
-- cadastral section;
-- sheet (`foglio`);
-- parcel (`particella`);
-- subaltern, where applicable;
-- for lease / gratuitous loan: registration date, office, number, sub-number and series.
+### VIES / intra-EU operations
 
-This is the largest onboarding addition discovered in the first research pass. "I work from home" does not mean these fields can be guessed from the residential address.
+Quadro I's intra-EU operation information is conceptually separate from Quadro B's art. 60-bis checkbox.
 
-### Intra-EU operations / VIES
+The user-facing question must describe the actual business situation rather than ask "Do you need VIES?". Exact wording remains P0 research.
 
-The Quadro I intra-EU field is for the intention to perform intra-Community operations for VIES inclusion.
+### Activity-specific client/public-place/investment information
 
-v0 needs an explicit question such as:
+These additional fields apply only to activity codes identified by the relevant Agenzia provisions.
 
-> Do you expect to buy or sell goods/services in transactions that require you to operate as an intra-EU VAT subject?
+The historical special-code list does not include programming code `62.01.00`, the predecessor of ATECO 2025 `62.10.00`. Before encoding `NOT_APPLICABLE`, retain the source-backed ATECO correspondence in the rule registry.
 
-The legal wording and UX of that question still require review before implementation. If applicable, expected acquisition/supply amounts are user estimates.
+## Signatures and attachments
 
-Do **not** reuse the Quadro B art. 60-bis goods checkbox for VIES: the instructions explicitly distinguish them.
+The app may prepare a draft/review packet but never fabricate the taxpayer's signature.
 
-### Client type / public place / initial investments
+Derived:
 
-These three activity-specific fields apply only to the activity codes identified by the 21 December 2006 provision as amended on 14 January 2008.
-
-The 2008 ATECO 2007 list is:
-
-- `46.49.90`
-- `46.76.90`
-- `46.90.00`
-- `47.59.99`
-- `47.78.99`
-- `63.99.00`
-- `74.90.99`
-- `82.99.99`
-
-ATECO 2025 `62.10.00` corresponds to the prior programming code `62.01.00`, not to one of those special activity codes. Therefore **these three fields are not applicable to the v0 programming path**.
-
-This conclusion should be encoded by a source-backed classification rule, not by an LLM.
-
-## Attachments
-
-The form has an attachments section for documents requested by the office / presented to substantiate facts.
-
-Do not hardcode "no attachments" globally. For the supported direct simple opening path, the app should create a checklist based on submission channel and facts. Postal submission, for example, requires a copy of the declarant's identity document according to the instructions.
-
-## Signature / declaration completion
-
-The application may prepare the document but **must not manufacture the taxpayer's signature**.
-
-Derived fields:
-
-- list of completed quadri;
-- total page count;
-- fiscal code of signer from confirmed taxpayer profile.
+- completed-quadri list;
+- page count;
+- signer fiscal code from confirmed profile.
 
 User action:
 
-- review packet;
-- confirm declaration data;
-- date/sign as required by the chosen submission channel.
+- review;
+- confirm;
+- sign/date as required by the filing channel.
 
-Delegation and intermediary sections remain blank in the v0 direct-submission path.
+Attachments are channel/fact dependent. For example, the official instructions require an identity-document copy for postal submission. Do not globally hardcode "no attachments".
 
-## Submission channels supported by the instructions
+## Submission
 
-For taxpayers not required to register with Registro delle Imprese, the instructions list:
+Official instructions permit, for taxpayers not required to register with Registro delle Imprese, direct office delivery, registered post, or telematic filing directly/by an authorized intermediary.
 
-1. direct delivery, also by delegated person, to an Agenzia delle Entrate office;
-2. registered post to an Agenzia office, with identity-document copy;
-3. telematic submission directly by the taxpayer or through an authorized intermediary.
+Agenzia's telematic material confirms that AA9/12 has an official compilation/control path and technical file specifications.
 
-The application is **not** an authorized intermediary in v0. It prepares a reviewable/exportable packet and guides the taxpayer through a legally available direct channel.
+v0 is **not** an authorized intermediary. We must decide separately whether v0:
 
-The precise current 2026 online UX/service name must be verified separately before the UI tells a user which buttons to click.
+- only produces a reviewable human-signable packet/checklist; or
+- also produces a technically valid telematic payload for direct taxpayer submission.
 
-## Proposed internal field contract
+The latter requires exact specification/control tests before implementation.
 
-Do not make `AA912Draft.fields: dict[str, str]` the long-term authoritative contract. After this research is closed, replace it with typed sections.
+## Internal contract direction
 
-Each consequential field specification should carry at least:
+`AA912Draft.fields: dict[str, str]` is only temporary scaffolding.
+
+The final document module should own typed sections such as:
+
+```text
+AA912Draft
+├── header
+├── declaration
+├── taxpayer
+├── holder
+├── opening_information
+└── completion
+```
+
+Every consequential field definition carries:
 
 ```text
 field_id
-section
 value_type
-origin
+state/origin
 required_when
 validation
 source_id
 review_behavior
 ```
 
-A renderer consumes only a validated `AA912Draft`; it never applies fiscal logic itself.
+The renderer receives an already validated draft and contains **zero fiscal decision logic**.
 
-## P0 research still open
+## P0 open work
 
-1. Confirm current 2026 direct electronic submission workflow and technical payload/specification for AA9/12.
-2. Decide whether v0 exports only a human-signable PDF/checklist or also a telematic file compatible with Agenzia specifications.
-3. Specify exact rules/UX for B/C/F `scritture contabili` in a simple forfettario professional case.
-4. Specify the Quadro I VIES question so the user can answer reliably without knowing tax jargon.
-5. Confirm the 2026 treatment of Quadro I property data for a professional working from their own residence, including edge cases where no separate "studio" exists.
-6. Confirm Gestione Separata registration as a separate post/opening workflow; it is not an AA9/12 field.
-7. Verify whether any 2025/2026 administrative update supersedes the 2024 AA9/12 instructions or the older technical submission software/specification.
+1. #8 — verify Quadro I property-field requiredness for the home-based professional path against Agenzia technical validation.
+2. Verify current direct electronic filing UX and the applicable AA9/12 technical payload/control package.
+3. Define exact accounting-record-storage UX for a simple professional.
+4. Define plain-language VIES questions and edge cases.
+5. Confirm the source-backed ATECO correspondence used for activity-specific Quadro I fields.
+6. Keep Gestione Separata registration as a separate workflow; it is not an AA9/12 field.
+7. Confirm no newer Agenzia update supersedes the current model/instructions/specification used by v0.
 
-Until these are resolved, implementation must expose them as incomplete research, not silently choose defaults.
-
-## Engineering acceptance for issue #1
-
-Issue #1 should close only when:
-
-- every AA9/12 field that can appear in the supported opening path is typed and mapped;
-- each field has an origin and source;
-- unsupported triggering facts are explicit gates;
-- the current submission method is documented;
-- no consequential field is populated by LLM inference;
-- the manual test for opening reflects all required user facts;
-- a synthetic taxpayer can be deterministically transformed into a validated internal AA9/12 draft.
+Issue #1 closes only when every field reachable by the supported path is typed, sourced and deterministically required/conditional/not-applicable, and a synthetic taxpayer can produce the same validated draft without an LLM.
