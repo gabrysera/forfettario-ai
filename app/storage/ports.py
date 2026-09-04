@@ -1,7 +1,7 @@
 from collections.abc import Mapping
-from typing import Any, Protocol, TypeAlias
+from typing import Any, Protocol
 
-Entity: TypeAlias = dict[str, Any]
+type Entity = dict[str, Any]
 
 
 class UserStateRepository(Protocol):
