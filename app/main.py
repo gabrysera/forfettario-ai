@@ -12,7 +12,7 @@ def create_app() -> FastAPI:
 
     @app.get("/", response_class=HTMLResponse)
     async def home(request: Request) -> HTMLResponse:
-        return _templates.TemplateResponse(request, "index.html")
+        return _templates.TemplateResponse(request=request, name="index.html")
 
     @app.get("/health")
     async def health() -> dict[str, str]:
