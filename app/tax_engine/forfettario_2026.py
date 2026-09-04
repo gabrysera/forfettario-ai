@@ -116,10 +116,7 @@ def _must_be_false(condition_id: str, value: bool | None, source_id: str) -> Con
 
 
 def _supported_residency(value: bool | None) -> ConditionResult:
-    if value is True:
-        status = ConditionStatus.PASS
-    else:
-        status = ConditionStatus.UNKNOWN
+    status = ConditionStatus.PASS if value is True else ConditionStatus.UNKNOWN
     return ConditionResult("FORF-EXCL-002", status, ("LAW190-C57-B",))
 
 
@@ -140,9 +137,10 @@ def _employment_income_condition(facts: ForfettarioFacts) -> ConditionResult:
 def _predecessor_revenue_condition(facts: StartupRateFacts) -> ConditionResult:
     if facts.continues_activity_previously_run_by_another_person is False:
         status = ConditionStatus.PASS
-    elif facts.continues_activity_previously_run_by_another_person is None:
-        status = ConditionStatus.UNKNOWN
-    elif facts.predecessor_previous_year_revenue is None:
+    elif (
+        facts.continues_activity_previously_run_by_another_person is None
+        or facts.predecessor_previous_year_revenue is None
+    ):
         status = ConditionStatus.UNKNOWN
     else:
         status = (
