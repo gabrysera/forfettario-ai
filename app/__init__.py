@@ -1,0 +1,1 @@
+"""Forfettario AI application package."""
