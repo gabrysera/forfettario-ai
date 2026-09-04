@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "forfettario-ai"
+version = "0.0.1"
+description = "AI-native tax copilot for simple Italian regime forfettario freelancers"
+requires-python = ">=3.13,<3.15"
+dependencies = [
+  "azure-data-tables>=12.7,<13",
+  "azure-functions>=1.23,<2",
+  "azure-identity>=1.24,<2",
+  "azure-storage-blob>=12.26,<13",
+  "fastapi>=0.116,<1",
+  "jinja2>=3.1,<4",
+  "pydantic>=2.11,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx>=0.28,<1",
+  "mypy>=1.17,<2",
+  "playwright>=1.55,<2",
+  "pytest>=8.4,<9",
+  "pytest-asyncio>=1.1,<2",
+  "ruff>=0.12,<1",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+ignore_missing_imports = true
