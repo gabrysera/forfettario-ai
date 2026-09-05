@@ -5,7 +5,7 @@ from app.storage.memory import (
     InMemoryDocumentStore,
     InMemoryUserStateRepository,
 )
-from app.storage.ports import AuditEventAlreadyExists
+from app.storage.ports import AuditEventAlreadyExists, DocumentAlreadyExists
 
 
 @pytest.mark.asyncio
@@ -36,10 +36,14 @@ async def test_audit_events_are_append_only() -> None:
 
 
 @pytest.mark.asyncio
-async def test_document_store_round_trip() -> None:
+async def test_documents_are_immutable() -> None:
     store = InMemoryDocumentStore()
+    path = "user-a/aa912/2026/document.pdf"
 
-    await store.put("user-a/aa912/2026/document.pdf", b"pdf", "application/pdf")
+    await store.put(path, b"first", "application/pdf")
 
-    assert await store.get("user-a/aa912/2026/document.pdf") == b"pdf"
+    with pytest.raises(DocumentAlreadyExists):
+        await store.put(path, b"replacement", "application/pdf")
+
+    assert await store.get(path) == b"first"
     assert await store.get("missing.pdf") is None
