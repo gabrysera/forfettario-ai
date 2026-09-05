@@ -132,6 +132,8 @@ class AA912OpeningProfile(Model):
             raise ValueError("activity address is required when it differs from residence")
         if self.activity_at_residence and self.activity_address is not None:
             raise ValueError("activity address must be omitted when activity is at residence")
+        if not self.records_at_activity_address:
+            raise ValueError("v0 supports records kept at the activity address only")
         if self.declaration_date is not None and self.start_date > self.declaration_date:
             raise ValueError("start date cannot be after declaration date")
         if (self.fax_prefix is None) != (self.fax_number is None):
