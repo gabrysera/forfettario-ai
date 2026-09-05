@@ -1,0 +1,37 @@
+from .models import (
+    AA912Draft,
+    AA912OpeningProfile,
+    SUPPORTED_ACTIVITY_DESCRIPTION,
+    SUPPORTED_ATECO_CODE,
+)
+
+_FORFETTARIO_REGIME_CODE = "2"
+_COMPILED_SECTIONS = ("A", "B", "C", "I")
+_TOTAL_DECLARATION_PAGES = 4
+
+
+def build_aa912_draft(profile: AA912OpeningProfile) -> AA912Draft:
+    return AA912Draft(
+        fiscal_code=profile.fiscal_code,
+        surname=profile.surname,
+        given_name=profile.given_name,
+        birth_date=profile.birth_date,
+        birth_municipality=profile.birth_municipality,
+        birth_province=profile.birth_province,
+        residence=profile.residence,
+        activity_address=profile.effective_activity_address,
+        records_at_activity_address=profile.records_at_activity_address,
+        start_date=profile.start_date,
+        declaration_date=profile.declaration_date,
+        ateco_code=SUPPORTED_ATECO_CODE,
+        activity_description=SUPPORTED_ACTIVITY_DESCRIPTION,
+        tax_regime_code=_FORFETTARIO_REGIME_CODE,
+        email=profile.email,
+        phone=profile.phone,
+        fax=profile.fax,
+        website=profile.website,
+        property=profile.property,
+        intra_eu=profile.intra_eu,
+        compiled_sections=_COMPILED_SECTIONS,
+        total_pages=_TOTAL_DECLARATION_PAGES,
+    )
