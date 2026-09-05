@@ -122,7 +122,7 @@ def _profile_values(values: dict[str, str]) -> dict[str, object]:
         "fax_prefix": _optional(values, "fax_prefix"),
         "fax_number": _optional(values, "fax_number"),
         "website": _optional(values, "website"),
-        "property": property_values,
+        "activity_property": property_values,
         "intra_eu": intra_eu,
     }
 
@@ -175,6 +175,6 @@ def _validation_message(exc: ValidationError) -> str:
         "activity_address.province": "Controlla la provincia del luogo di lavoro.",
         "email": "Controlla l'indirizzo email.",
         "intra_eu": "Controlla i dati relativi alle operazioni con altri Paesi UE.",
-        "property": "Controlla i dati dell'immobile e, se applicabile, del contratto.",
+        "activity_property": "Controlla i dati dell'immobile e, se applicabile, del contratto.",
     }
     return messages.get(field, "Controlla i dati inseriti nei campi evidenziati.")
