@@ -99,8 +99,10 @@ class AA912OpeningProfile(Model):
     start_date: date
     declaration_date: date | None = None
     email: str = Field(min_length=3, max_length=120)
-    phone: str = Field(min_length=3, max_length=30)
-    fax: str | None = Field(default=None, max_length=30)
+    phone_prefix: str = Field(min_length=1, max_length=8)
+    phone_number: str = Field(min_length=3, max_length=20)
+    fax_prefix: str | None = Field(default=None, max_length=8)
+    fax_number: str | None = Field(default=None, max_length=20)
     website: str | None = Field(default=None, max_length=160)
     property: PropertyDetails
     intra_eu: IntraEUPlan
@@ -132,6 +134,8 @@ class AA912OpeningProfile(Model):
             raise ValueError("activity address must be omitted when activity is at residence")
         if self.declaration_date is not None and self.start_date > self.declaration_date:
             raise ValueError("start date cannot be after declaration date")
+        if (self.fax_prefix is None) != (self.fax_number is None):
+            raise ValueError("fax prefix and number must be provided together")
         return self
 
     @property
@@ -160,8 +164,10 @@ class AA912Draft(Model):
     activity_description: str
     tax_regime_code: str
     email: str
-    phone: str
-    fax: str | None
+    phone_prefix: str
+    phone_number: str
+    fax_prefix: str | None
+    fax_number: str | None
     website: str | None
     property: PropertyDetails
     intra_eu: IntraEUPlan
