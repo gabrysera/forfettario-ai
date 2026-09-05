@@ -22,7 +22,7 @@
   "fax_prefix": null,
   "fax_number": null,
   "website": "https://example.test",
-  "property": {
+  "activity_property": {
     "tenure": "P",
     "cadastre_type": "F",
     "section": null,
