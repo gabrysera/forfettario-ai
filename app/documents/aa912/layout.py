@@ -32,6 +32,7 @@ class CenterField:
     page: int
     x: float
     top: float
+    max_width: float | None = None
     font_size: float = 8.0
 
 
@@ -60,7 +61,7 @@ ACTIVITY_POSTAL_CODE = BoxedField(2, 120.0, 496.8, 5)
 ACTIVITY_MUNICIPALITY = TextField(2, 193.0, 496.5, 345.0)
 ACTIVITY_PROVINCE = BoxedField(2, 548.0, 496.8, 2)
 ACTIVITY_RECORDS_MARK = MarkField(2, 556.5, 477.8)
-TAX_REGIME = CenterField(2, 323.5, 548.0)
+TAX_REGIME = CenterField(2, 323.5, 548.0, 10.0)
 TITULAR_FISCAL_CODE = BoxedField(2, 162.0, 626.0, 16)
 TITULAR_SURNAME = TextField(2, 350.0, 630.0, 105.0)
 TITULAR_GIVEN_NAME = TextField(2, 460.0, 630.0, 95.0)
@@ -78,12 +79,12 @@ EMAIL = TextField(4, 115.0, 463.0, 245.0, 8.0)
 PHONE = TextField(4, 400.0, 463.0, 58.0, 8.0)
 FAX = TextField(4, 498.0, 463.0, 58.0, 8.0)
 WEBSITE = TextField(4, 115.0, 487.0, 430.0, 8.0)
-PROPERTY_TENURE = CenterField(4, 146.0, 511.0)
-CADASTRE_TYPE = CenterField(4, 208.0, 511.0)
-CADASTRE_SECTION = CenterField(4, 271.0, 511.0)
-CADASTRE_SHEET = CenterField(4, 336.0, 511.0)
-CADASTRE_PARCEL = CenterField(4, 430.0, 511.0)
-CADASTRE_SUBUNIT = CenterField(4, 520.0, 511.0)
+PROPERTY_TENURE = CenterField(4, 146.0, 511.0, 55.0)
+CADASTRE_TYPE = CenterField(4, 208.0, 511.0, 55.0)
+CADASTRE_SECTION = CenterField(4, 271.0, 511.0, 55.0)
+CADASTRE_SHEET = CenterField(4, 336.0, 511.0, 55.0)
+CADASTRE_PARCEL = CenterField(4, 430.0, 511.0, 112.0)
+CADASTRE_SUBUNIT = CenterField(4, 520.0, 511.0, 50.0)
 CONTRACT_DATE = BoxedField(4, 247.0, 539.0, 8, 14.4)
 CONTRACT_OFFICE = TextField(4, 362.0, 539.0, 40.0, 7.5)
 CONTRACT_NUMBER = TextField(4, 406.0, 539.0, 80.0, 7.5)
@@ -99,6 +100,6 @@ COMPILED_SECTION_MARKS = {
     "C": MarkField(5, 330.0, 92.8),
     "I": MarkField(5, 459.5, 92.8),
 }
-TOTAL_PAGES = CenterField(5, 550.0, 93.0)
+TOTAL_PAGES = CenterField(5, 550.0, 93.0, 14.0)
 DECLARATION_DATE = BoxedField(5, 137.0, 133.8, 8, 10.8)
 SIGNER_FISCAL_CODE = BoxedField(5, 344.0, 133.8, 16)
