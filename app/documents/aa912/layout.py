@@ -76,8 +76,10 @@ RESIDENCE_PROVINCE = BoxedField(2, 548.0, 701.8, 2)
 
 # Page 4 - Quadro I.
 EMAIL = TextField(4, 115.0, 463.0, 245.0, 8.0)
-PHONE = TextField(4, 400.0, 463.0, 58.0, 8.0)
-FAX = TextField(4, 498.0, 463.0, 58.0, 8.0)
+PHONE_PREFIX = TextField(4, 367.0, 463.0, 28.0, 8.0)
+PHONE_NUMBER = TextField(4, 400.0, 463.0, 58.0, 8.0)
+FAX_PREFIX = TextField(4, 466.0, 463.0, 27.0, 8.0)
+FAX_NUMBER = TextField(4, 498.0, 463.0, 58.0, 8.0)
 WEBSITE = TextField(4, 115.0, 487.0, 430.0, 8.0)
 PROPERTY_TENURE = CenterField(4, 146.0, 511.0, 55.0)
 CADASTRE_TYPE = CenterField(4, 208.0, 511.0, 55.0)
