@@ -24,15 +24,24 @@ CORE_BOUNDARIES = {
     Path("app/documents"): {
         "app.ai",
         "app.storage",
+        "app.tax_engine",
         "app.web",
         "azure",
+        "fastapi",
+        "openai",
+    },
+    Path("app/storage"): {
+        "app.ai",
+        "app.documents",
+        "app.tax_engine",
+        "app.web",
         "fastapi",
         "openai",
     },
 }
 
 
-def test_core_modules_keep_infrastructure_out() -> None:
+def test_module_dependencies_point_inward() -> None:
     violations: list[str] = []
 
     for root, forbidden_prefixes in CORE_BOUNDARIES.items():
