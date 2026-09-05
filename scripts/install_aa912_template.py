@@ -1,6 +1,6 @@
-from pathlib import Path
 import shutil
 import sys
+from pathlib import Path
 
 from pypdf import PdfReader
 
@@ -9,7 +9,9 @@ _TARGET = Path("var/templates/aa9_12.pdf")
 
 def main() -> None:
     if len(sys.argv) != 2:
-        raise SystemExit("usage: python scripts/install_aa912_template.py /path/to/official-aa9-12.pdf")
+        raise SystemExit(
+            "usage: python scripts/install_aa912_template.py /path/to/official-aa9-12.pdf"
+        )
 
     source = Path(sys.argv[1])
     reader = PdfReader(source)
