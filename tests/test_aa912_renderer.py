@@ -16,10 +16,10 @@ def test_renderer_preserves_template_and_populates_quadro_i() -> None:
 
     assert len(reader.pages) == 5
     assert "TEMPLATE PAGE 1" in reader.pages[0].extract_text()
-    assert "RSSMRA80A01H501U" in reader.pages[1].extract_text().replace(" ", "")
+    assert "RSSMRA80A01H501U" in _compact(reader.pages[1].extract_text())
     assert "MARIO.ROSSI@EXAMPLE.TEST" in reader.pages[3].extract_text()
-    assert "1000" in reader.pages[3].extract_text().replace(" ", "")
-    assert "2500" in reader.pages[3].extract_text().replace(" ", "")
+    assert "1000" in _compact(reader.pages[3].extract_text())
+    assert "2500" in _compact(reader.pages[3].extract_text())
 
 
 def test_renderer_rejects_text_that_does_not_physically_fit() -> None:
@@ -27,3 +27,7 @@ def test_renderer_rejects_text_that_does_not_physically_fit() -> None:
 
     with pytest.raises(DocumentOverflowError):
         render_aa912(validated_synthetic_template(), draft)
+
+
+def _compact(text: str) -> str:
+    return "".join(text.split())
