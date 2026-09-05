@@ -173,6 +173,10 @@ def _validation_message(exc: ValidationError) -> str:
         "residence.province": "Controlla la provincia di residenza.",
         "activity_address.postal_code": "Inserisci un CAP di 5 cifre per il luogo di lavoro.",
         "activity_address.province": "Controlla la provincia del luogo di lavoro.",
+        "records_at_activity_address": (
+            "La v0 automatica supporta solo la documentazione fiscale conservata nel luogo "
+            "dell'attività. Questo caso richiede un percorso più completo."
+        ),
         "email": "Controlla l'indirizzo email.",
         "intra_eu": "Controlla i dati relativi alle operazioni con altri Paesi UE.",
         "activity_property": "Controlla i dati dell'immobile e, se applicabile, del contratto.",
