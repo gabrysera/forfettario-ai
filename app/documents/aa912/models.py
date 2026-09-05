@@ -58,7 +58,9 @@ class PropertyDetails(Model):
             self.contract_registration_office,
             self.contract_registration_number,
         )
-        if self.tenure is PropertyTenure.DETENTION and any(value in (None, "") for value in required):
+        if self.tenure is PropertyTenure.DETENTION and any(
+            value in (None, "") for value in required
+        ):
             raise ValueError("registration details are required for a rented/loaned property")
         return self
 
