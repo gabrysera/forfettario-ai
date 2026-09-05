@@ -32,9 +32,9 @@ These cover the minimum consequential Quadro I branches: possession vs detention
 
 ## Steps
 
-1. Start onboarding from an empty profile.
-2. Describe the activity in natural language as freelance software development.
-3. Answer all required eligibility questions.
+1. Start onboarding from an empty profile and verify that material yes/no branch answers are not silently preselected.
+2. Describe/confirm the activity as freelance software development.
+3. Answer all required eligibility questions with facts that deterministically pass the supported 2026 forfettario access assessment.
 4. Confirm the proposed activity classification.
 5. Enter required identity/address/start-date fields using synthetic data.
 6. Confirm whether the activity is carried out at the residence and where records are kept.
@@ -44,21 +44,23 @@ These cover the minimum consequential Quadro I branches: possession vs detention
 10. Request preparation of the opening package.
 11. Open the generated official AA9/12 PDF.
 12. Inspect physical page 2 (declaration page 1), physical page 4 (Quadro I) and physical page 5 (compiled-quadri/signature area).
-13. Inspect the audit/explanation view.
+13. Inspect the audit/explanation view when that part of the wider MVP is available.
 14. Repeat the PDF generation/review for each golden case above.
 
 ## Expected — deterministic/product behavior
 
 - The app does not infer unanswered material facts.
+- Material yes/no choices that affect eligibility, activity/address, records location, property tenure or VIES require an explicit user answer.
 - Activity and ATECO classification are distinct but linked.
 - Classification shown: ATECO 2025 `62.10.00` only when deterministic support exists and the user confirms the supported activity.
-- Eligibility result includes condition-level outcomes and a review status.
+- AA9/12 generation calls the deterministic 2026 forfettario access assessment before mapping regime code `2`.
+- A failed or unknown eligibility condition blocks document generation and identifies the area that requires review.
 - The same structured inputs produce the same deterministic result without an LLM.
 - AA9/12 mapping contains no unsupported guessed values.
 - Browser-supplied rogue ATECO or regime values cannot override the deterministic mapping.
 - A records location outside the supported activity-address path fails closed.
 - The output is marked for human review/signature and does not claim that submission occurred or that a VAT number was opened.
-- An audit record identifies the ruleset version and sources used.
+- When the wider MVP audit slice is connected, its audit record identifies the ruleset version and sources used.
 
 ## Expected — official PDF geometry/content
 
@@ -101,10 +103,14 @@ Case-specific expectations:
 
 In the same build, verify at least these failures:
 
+- an eligibility fact that makes the deterministic forfettario assessment fail => no PDF is generated;
+- supported software activity is not confirmed => no PDF is generated;
+- required eligibility fact omitted or invalid => validation error and no PDF;
 - invalid Italian fiscal-code checksum => validation error;
 - detention without required contract-registration details => validation error;
 - VIES yes without both expected volumes => validation error;
 - non-whole-euro VIES expected volume => validation error;
+- records stored outside the supported activity address => fail closed and no PDF;
 - different/modified AA9/12 PDF fingerprint => unsupported template;
 - value too wide for its physical field => document generation fails instead of clipping silently.
 
@@ -116,16 +122,17 @@ Capture:
 - eligibility explanation;
 - generated AA9/12 PDFs for all three golden cases;
 - screenshots/rendered images of physical pages 2, 4 and 5 for each case;
-- audit/source view;
+- audit/source view when available in the wider MVP;
 - CI run identifier and commit SHA;
 - exact supported official-template SHA-256.
 
 ## Pass condition
 
-This test passes only when:
+This test passes only when the complete #4 vertical slice is connected and:
 
 - every AA9/12 field reached by the supported archetype is mapped to an authoritative source or explicitly user-provided;
 - automated CI is green;
 - all three golden cases render successfully against the exact pinned official template;
 - the required pages have been visually inspected with no material geometry defect;
-- unsupported branches continue to fail closed.
+- unsupported branches continue to fail closed;
+- eligibility/classification/audit requirements from the wider MVP are wired end to end.
