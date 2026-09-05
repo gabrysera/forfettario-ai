@@ -82,7 +82,7 @@ def _opening_page(pdf: Canvas, draft: AA912Draft) -> None:
 
 
 def _quadro_i(pdf: Canvas, draft: AA912Draft) -> None:
-    property_details = draft.property
+    property_details = draft.activity_property
 
     _text(pdf, layout.EMAIL, draft.email)
     _text(pdf, layout.PHONE_PREFIX, draft.phone_prefix)
