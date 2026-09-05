@@ -21,7 +21,9 @@ class UserStateRepository(Protocol):
 
     async def upsert(self, user_id: str, row_key: str, values: Mapping[str, object]) -> None: ...
 
-    async def list_prefix(self, user_id: str, row_key_prefix: str) -> list[Entity]: ...
+    async def list_prefix(self, user_id: str, row_key_prefix: str) -> list[Entity]:
+        """List one non-empty RowKey prefix inside one user partition."""
+        ...
 
 
 class AuditRepository(Protocol):
