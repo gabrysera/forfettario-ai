@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Apri Partita IVA - Forfettario AI</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color-scheme: light; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #fafafa; color: #171717; }
+    main { max-width: 46rem; margin: 3rem auto; padding: 0 1.25rem 5rem; }
+    h1 { margin: .4rem 0; font-size: clamp(2rem, 6vw, 3.5rem); letter-spacing: -.045em; }
+    h2 { margin: 2.25rem 0 .75rem; font-size: 1.05rem; }
+    p { color: #666; line-height: 1.55; }
+    a { color: inherit; }
+    form { display: grid; gap: .85rem; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .85rem; }
+    .three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    label { display: grid; gap: .35rem; font-size: .9rem; }
+    input, select { width: 100%; border: 1px solid #d8d8d8; border-radius: .65rem; padding: .8rem; font: inherit; background: white; }
+    input:focus, select:focus { outline: 2px solid #111; outline-offset: 1px; }
+    fieldset { border: 0; padding: 0; margin: 0; }
+    legend { margin-bottom: .6rem; font-size: .9rem; }
+    .choices { display: flex; flex-wrap: wrap; gap: .6rem; }
+    .choice { display: flex; align-items: center; gap: .45rem; border: 1px solid #ddd; border-radius: .65rem; padding: .7rem .8rem; background: white; }
+    .choice input { width: auto; margin: 0; }
+    .muted { margin: 0; font-size: .86rem; color: #777; }
+    .fixed { padding: .8rem; border-radius: .65rem; background: #f1f1f1; font-size: .92rem; }
+    .error { margin: 1rem 0; padding: .85rem 1rem; border-radius: .65rem; background: #fff0f0; color: #881b1b; }
+    .conditional[hidden] { display: none; }
+    button { margin-top: 1.5rem; border: 0; border-radius: .7rem; padding: 1rem 1.2rem; background: #111; color: white; font: inherit; font-weight: 650; cursor: pointer; }
+    @media (max-width: 40rem) { .grid, .three { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <p><a href="/">Forfettario AI</a></p>
+    <h1>Apri la tua Partita IVA</h1>
+    <p>Rispondi alle domande e genera il modello AA9/12 ufficiale già compilato. L'app non firma e non invia nulla al posto tuo.</p>
+
+    {% if error %}<div class="error" role="alert">{{ error }}</div>{% endif %}
+
+    <form method="post" action="/opening/aa912.pdf">
+      <h2>Attività</h2>
+      <div class="fixed">Sviluppo software - ATECO 62.10.00 - regime forfettario</div>
+      <label>Quando inizi l'attività?
+        <input type="date" name="start_date" required value="{{ values.get('start_date', '') }}">
+      </label>
+
+      <h2>Dati personali</h2>
+      <label>Codice fiscale
+        <input name="fiscal_code" required maxlength="16" autocomplete="off" value="{{ values.get('fiscal_code', '') }}">
+      </label>
+      <div class="grid">
+        <label>Cognome
+          <input name="surname" required value="{{ values.get('surname', '') }}">
+        </label>
+        <label>Nome
+          <input name="given_name" required value="{{ values.get('given_name', '') }}">
+        </label>
+        <label>Data di nascita
+          <input type="date" name="birth_date" required value="{{ values.get('birth_date', '') }}">
+        </label>
+        <label>Comune di nascita
+          <input name="birth_municipality" required value="{{ values.get('birth_municipality', '') }}">
+        </label>
+        <label>Provincia di nascita
+          <input name="birth_province" maxlength="2" required value="{{ values.get('birth_province', '') }}">
+        </label>
+      </div>
+
+      <h2>Residenza</h2>
+      <label>Indirizzo completo
+        <input name="residence_address" required placeholder="Via Roma 10" value="{{ values.get('residence_address', '') }}">
+      </label>
+      <div class="three">
+        <label>CAP
+          <input name="residence_postal_code" inputmode="numeric" maxlength="5" required value="{{ values.get('residence_postal_code', '') }}">
+        </label>
+        <label>Comune
+          <input name="residence_municipality" required value="{{ values.get('residence_municipality', '') }}">
+        </label>
+        <label>Provincia
+          <input name="residence_province" maxlength="2" required value="{{ values.get('residence_province', '') }}">
+        </label>
+      </div>
+
+      <h2>Dove lavorerai normalmente?</h2>
+      <fieldset>
+        <legend>Luogo principale dell'attività</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="activity_at_residence" value="yes" required {% if values.get('activity_at_residence', 'yes') == 'yes' %}checked{% endif %}> Da casa</label>
+          <label class="choice"><input type="radio" name="activity_at_residence" value="no" required {% if values.get('activity_at_residence') == 'no' %}checked{% endif %}> Da un altro luogo</label>
+        </div>
+      </fieldset>
+
+      <div id="activity-address" class="conditional grid" {% if values.get('activity_at_residence', 'yes') != 'no' %}hidden{% endif %}>
+        <label style="grid-column: 1 / -1">Indirizzo del luogo di lavoro
+          <input name="activity_address" value="{{ values.get('activity_address', '') }}">
+        </label>
+        <label>CAP
+          <input name="activity_postal_code" maxlength="5" value="{{ values.get('activity_postal_code', '') }}">
+        </label>
+        <label>Comune
+          <input name="activity_municipality" value="{{ values.get('activity_municipality', '') }}">
+        </label>
+        <label>Provincia
+          <input name="activity_province" maxlength="2" value="{{ values.get('activity_province', '') }}">
+        </label>
+      </div>
+
+      <fieldset>
+        <legend>Conserverai la documentazione fiscale nello stesso luogo in cui lavori?</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="records_at_activity_address" value="yes" required {% if values.get('records_at_activity_address', 'yes') == 'yes' %}checked{% endif %}> Sì</label>
+          <label class="choice"><input type="radio" name="records_at_activity_address" value="no" required {% if values.get('records_at_activity_address') == 'no' %}checked{% endif %}> No</label>
+        </div>
+      </fieldset>
+      <p class="muted">Il percorso automatico genera il PDF anche se rispondi “No”, ma non inventa un diverso luogo di conservazione.</p>
+
+      <h2>Contatti</h2>
+      <label>Email
+        <input type="email" name="email" required value="{{ values.get('email', '') }}">
+      </label>
+      <div class="grid">
+        <label>Prefisso telefono
+          <input name="phone_prefix" required placeholder="+39" value="{{ values.get('phone_prefix', '+39') }}">
+        </label>
+        <label>Numero telefono
+          <input name="phone_number" required inputmode="tel" value="{{ values.get('phone_number', '') }}">
+        </label>
+        <label>Prefisso fax <span class="muted">(opzionale)</span>
+          <input name="fax_prefix" value="{{ values.get('fax_prefix', '') }}">
+        </label>
+        <label>Numero fax <span class="muted">(opzionale)</span>
+          <input name="fax_number" value="{{ values.get('fax_number', '') }}">
+        </label>
+      </div>
+      <label>Sito web <span class="muted">(opzionale)</span>
+        <input name="website" value="{{ values.get('website', '') }}">
+      </label>
+
+      <h2>Immobile dove svolgi l'attività</h2>
+      <p class="muted">Il modello AA9/12 chiede i dati catastali dell'immobile usato per l'attività prevalente. Se lavori da casa, sono i dati di casa.</p>
+      <fieldset>
+        <legend>Come utilizzi questo immobile?</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="property_tenure" value="P" required {% if values.get('property_tenure', 'P') == 'P' %}checked{% endif %}> Proprietà / altro possesso</label>
+          <label class="choice"><input type="radio" name="property_tenure" value="D" required {% if values.get('property_tenure') == 'D' %}checked{% endif %}> Affitto o comodato</label>
+        </div>
+      </fieldset>
+      <div class="grid">
+        <label>Tipo catasto
+          <select name="cadastre_type" required>
+            <option value="F" {% if values.get('cadastre_type', 'F') == 'F' %}selected{% endif %}>Fabbricato</option>
+            <option value="T" {% if values.get('cadastre_type') == 'T' %}selected{% endif %}>Terreno</option>
+          </select>
+        </label>
+        <label>Sezione <span class="muted">(se presente)</span>
+          <input name="cadastre_section" value="{{ values.get('cadastre_section', '') }}">
+        </label>
+        <label>Foglio
+          <input name="cadastre_sheet" required value="{{ values.get('cadastre_sheet', '') }}">
+        </label>
+        <label>Particella
+          <input name="cadastre_parcel" required value="{{ values.get('cadastre_parcel', '') }}">
+        </label>
+        <label>Subalterno <span class="muted">(se presente)</span>
+          <input name="cadastre_subunit" value="{{ values.get('cadastre_subunit', '') }}">
+        </label>
+      </div>
+
+      <div id="contract" class="conditional" {% if values.get('property_tenure', 'P') != 'D' %}hidden{% endif %}>
+        <p class="muted">Per affitto o comodato servono gli estremi di registrazione del contratto.</p>
+        <div class="grid">
+          <label>Data registrazione
+            <input type="date" name="contract_registration_date" value="{{ values.get('contract_registration_date', '') }}">
+          </label>
+          <label>Ufficio
+            <input name="contract_registration_office" value="{{ values.get('contract_registration_office', '') }}">
+          </label>
+          <label>Numero
+            <input name="contract_registration_number" value="{{ values.get('contract_registration_number', '') }}">
+          </label>
+          <label>Sotto numero <span class="muted">(se presente)</span>
+            <input name="contract_registration_subnumber" value="{{ values.get('contract_registration_subnumber', '') }}">
+          </label>
+          <label>Serie <span class="muted">(se presente)</span>
+            <input name="contract_registration_series" value="{{ values.get('contract_registration_series', '') }}">
+          </label>
+        </div>
+      </div>
+
+      <h2>Clienti o fornitori in altri Paesi UE</h2>
+      <fieldset>
+        <legend>Vuoi richiedere l'inclusione nel VIES per effettuare operazioni intracomunitarie?</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="wants_vies" value="no" required {% if values.get('wants_vies', 'no') == 'no' %}checked{% endif %}> No</label>
+          <label class="choice"><input type="radio" name="wants_vies" value="yes" required {% if values.get('wants_vies') == 'yes' %}checked{% endif %}> Sì</label>
+        </div>
+      </fieldset>
+      <div id="vies" class="conditional grid" {% if values.get('wants_vies', 'no') != 'yes' %}hidden{% endif %}>
+        <label>Acquisti UE previsti in un anno (€)
+          <input name="expected_eu_purchases" inputmode="numeric" value="{{ values.get('expected_eu_purchases', '') }}">
+        </label>
+        <label>Cessioni/prestazioni UE previste in un anno (€)
+          <input name="expected_eu_sales" inputmode="numeric" value="{{ values.get('expected_eu_sales', '') }}">
+        </label>
+      </div>
+
+      <h2>Controllo e firma</h2>
+      <label>Data della dichiarazione
+        <input type="date" name="declaration_date" value="{{ values.get('declaration_date', today) }}">
+      </label>
+      <p class="muted">La firma rimane vuota. Dopo il download controlla il PDF prima di firmarlo e presentarlo.</p>
+
+      <button type="submit">Genera AA9/12 da controllare</button>
+    </form>
+  </main>
+
+  <script>
+    const toggle = (name, value, id) => {
+      const target = document.getElementById(id);
+      const selected = document.querySelector(`input[name="${name}"]:checked`);
+      target.hidden = !selected || selected.value !== value;
+    };
+    const bindings = [
+      ["activity_at_residence", "no", "activity-address"],
+      ["property_tenure", "D", "contract"],
+      ["wants_vies", "yes", "vies"],
+    ];
+    for (const [name, value, id] of bindings) {
+      document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
+        input.addEventListener("change", () => toggle(name, value, id));
+      });
+      toggle(name, value, id);
+    }
+  </script>
+</body>
+</html>
