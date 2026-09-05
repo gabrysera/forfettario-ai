@@ -7,7 +7,7 @@ from reportlab.pdfgen.canvas import Canvas
 
 from app.documents.aa912.models import AA912OpeningData
 
-_, _PAGE_HEIGHT = A4
+_PAGE_HEIGHT: float = float(A4[1])
 _EXPECTED_TEMPLATE_PAGES = 5
 _BOX_STEP = 14.4
 
@@ -51,8 +51,8 @@ def _overlay(page_index: int, data: AA912OpeningData) -> PageObject:
 
 
 def _page_header(pdf: Canvas, page_index: int, fiscal_code: str) -> None:
-    x = 237.0 if page_index < 4 else 235.0
-    top = 145.0 if page_index < 4 else 45.0
+    x = 235.0 if page_index == 4 else 237.0
+    top = 145.0 if page_index == 1 else 45.0
     _boxed(pdf, fiscal_code, x=x, top=top)
     _text_center(pdf, str(page_index), x=546.0, top=top)
 
@@ -74,7 +74,7 @@ def _opening_page(pdf: Canvas, data: AA912OpeningData) -> None:
         _mark(pdf, x=556.5, top=477.8)
 
     # AA9/12 code 2 = regime forfettario for the supported opening path.
-    _text_center(pdf, "2", x=333.0, top=541.5)
+    _text_center(pdf, "2", x=323.5, top=548.0)
 
     _boxed(pdf, data.fiscal_code, x=162.0, top=626.0)
     _text(pdf, data.surname, x=350.0, top=630.0)
