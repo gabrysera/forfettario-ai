@@ -1,5 +1,4 @@
 import os
-from datetime import date
 from pathlib import Path
 
 from fastapi import APIRouter, Request, Response
@@ -107,9 +106,7 @@ def _require_supported_opening(values: dict[str, str]) -> None:
             "works_prevalently_for_current_or_recent_employer": _required_bool(
                 values, "works_prevalently_for_current_or_recent_employer"
             ),
-            "previous_year_employment_income": _required(
-                values, "previous_year_employment_income"
-            ),
+            "previous_year_employment_income": _required(values, "previous_year_employment_income"),
             "employment_relationship_ended": _required_bool(
                 values, "employment_relationship_ended"
             ),
@@ -207,7 +204,7 @@ def _form_response(
     return templates.TemplateResponse(
         request=request,
         name="opening.html",
-        context={"today": date.today().isoformat(), "error": error, "values": values},
+        context={"error": error, "values": values},
         status_code=status_code,
     )
 
