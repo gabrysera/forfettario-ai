@@ -1,6 +1,6 @@
 from collections.abc import Mapping
 
-from .ports import AuditEventAlreadyExists, Entity
+from .ports import AuditEventAlreadyExists, DocumentAlreadyExists, Entity
 
 
 class InMemoryUserStateRepository:
@@ -50,6 +50,8 @@ class InMemoryDocumentStore:
 
     async def put(self, path: str, data: bytes, content_type: str) -> None:
         del content_type
+        if path in self._documents:
+            raise DocumentAlreadyExists(path)
         self._documents[path] = data
 
     async def get(self, path: str) -> bytes | None:
