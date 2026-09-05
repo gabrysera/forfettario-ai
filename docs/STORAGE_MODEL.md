@@ -16,6 +16,8 @@ The design must optimize for the application's actual access patterns, not for r
 6. Never rely on whole-table scans for normal application workflows.
 7. Do not model cross-user joins.
 8. Every stored entity must have an explicit schema version.
+9. Generated fiscal documents are immutable artifacts: a regenerated document receives a new id/path rather than overwriting an existing blob.
+10. Azure/provider exceptions are translated by adapters when the application needs stable conflict/not-found semantics.
 
 ## Core access patterns
 
@@ -146,11 +148,13 @@ Do not assume cross-partition or cross-table transactions.
 
 For workflows spanning Table and Blob Storage:
 
-1. write/generate blob with an opaque temporary/final path;
+1. create a blob at its final opaque/versioned path;
 2. persist deterministic metadata/state;
-3. append audit event;
+3. append the audit event;
 4. make retries idempotent;
 5. define cleanup behavior for orphaned blobs.
+
+A blob-path collision is an application conflict, not an overwrite request. The caller must create a new document id/path.
 
 ## Blob Storage
 
@@ -177,6 +181,8 @@ Examples:
 Blob names must not contain taxpayer names, fiscal codes, client names or invoice descriptions.
 
 Private access only by default. Generate short-lived access only through authenticated server-side flows when required.
+
+Generated fiscal blobs are create-only. Never use overwrite semantics for a path that may already have been shown to a user or referenced by an audit event.
 
 ## Concurrency and idempotency
 
@@ -209,6 +215,8 @@ AzureBlobDocumentStore
 Most tests use in-memory implementations.
 
 Azure adapter tests may use Azurite or a dedicated Azure test environment.
+
+In-memory fakes must reproduce the externally observable semantics of the Azure adapters for application-owned contracts such as append conflicts and immutable-document conflicts.
 
 ## Migration/versioning strategy
 

@@ -28,6 +28,53 @@ FastAPI application
 
 Do not split these modules into deployable services in v0.
 
+## Patterns we deliberately use
+
+Use patterns only where they make the code smaller, safer or easier to test.
+
+### Functional core, imperative shell
+
+Fiscal decisions, calculations, document mappings and validation are deterministic functions over typed inputs. HTTP, Azure, storage and LLM calls stay at the edges.
+
+This is the primary design pattern of the application.
+
+### Ports and adapters at real external boundaries
+
+Use small `Protocol` ports for infrastructure that has more than one meaningful implementation, such as persistence. In-memory fakes and Azure adapters implement the same observable contract.
+
+Do not introduce ports for ordinary internal function calls.
+
+### Adapter exception translation
+
+Provider-specific exceptions are caught inside adapters and translated into small application-owned errors when callers need consistent behavior. Application/domain code should never branch on Azure/OpenAI SDK exception classes.
+
+### Append-only audit log + current snapshots
+
+Consequential fiscal history is append-only. Mutable current-state entities exist only as read optimizations. This is intentionally **not** a full event-sourcing framework.
+
+Generated fiscal documents are immutable/versioned artifacts. Regeneration creates a new document id instead of overwriting an existing blob.
+
+### Versioned rule modules
+
+Fiscal rules are grouped by applicable period and backed by stable source IDs. Do not introduce a Strategy class hierarchy while a small year-specific module/pure function is sufficient.
+
+### Template profile for coordinate-based fiscal documents
+
+When a document such as AA9/12 is rendered onto an official PDF, layout coordinates belong to an explicitly versioned/fingerprinted template profile. Mapping decides *what* to write; layout decides *where*; renderer only performs deterministic drawing.
+
+## Patterns we deliberately avoid in v0
+
+Unless a concrete requirement proves otherwise, do not add:
+
+- dependency-injection containers;
+- generic repository frameworks or ORM-like abstractions;
+- Unit of Work;
+- CQRS infrastructure;
+- event-sourcing frameworks;
+- mediator/command-bus libraries;
+- service/factory classes that only forward calls;
+- abstract base classes where a function or `Protocol` is enough.
+
 ## Repository layout
 
 ```text
@@ -103,9 +150,9 @@ The diagram shows **allowed direction**, not a requirement that every module imp
 - OpenAI/provider SDKs;
 - `app.web`, `app.ai`, `app.storage` or `app.documents`.
 
-`app/documents` owns deterministic document schemas/mapping/rendering. It must not depend on web, AI, storage implementations or cloud SDKs.
+`app/documents` owns deterministic document schemas/mapping/rendering. It must not depend on web, AI, storage, tax-engine or cloud SDKs. Any orchestration between fiscal assessment and document generation belongs at the application edge, not inside the renderer/document module.
 
-`app/storage` owns persistence boundaries. Azure types stay inside the Azure adapter and never leak into domain/tax-engine signatures.
+`app/storage` owns persistence boundaries. Azure types stay inside the Azure adapter and never leak into domain/tax-engine signatures. Provider errors are translated at this boundary when their semantics are part of the port contract.
 
 `app/ai` may orchestrate deterministic tools but must never become the source of fiscal truth.
 
@@ -158,7 +205,7 @@ v0 uses Azure Storage only.
 Stores structured entities and append-only audit events. Access patterns are user-scoped and designed around `PartitionKey` / `RowKey`.
 
 ### Azure Blob Storage
-Stores generated/binary artifacts such as PDFs and export packets.
+Stores immutable generated/binary artifacts such as PDFs and export packets.
 
 See `docs/STORAGE_MODEL.md`.
 
@@ -188,7 +235,7 @@ Consequential state changes append audit events rather than only mutating opaque
 - Python Playwright for browser acceptance tests when UI workflows exist;
 - in-memory storage fakes for normal tests;
 - Azurite/isolated Azure only for adapter integration tests;
-- GitHub Actions for Ruff, mypy and pytest.
+- GitHub Actions for dependency consistency, Ruff, mypy and pytest.
 
 ## Deployment
 

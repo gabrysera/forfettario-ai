@@ -30,6 +30,8 @@ Rules:
 18. **Do not create a service/repository/interface merely because the pattern exists.** Introduce a port only where a real external boundary exists (Azure storage, LLM, clock, etc.).
 19. **Avoid mega-files and micro-files.** Keep related behavior together until separation improves clarity.
 20. **Every PR should leave the codebase simpler or equally simple.** Complexity added must be justified by user-visible behavior or a concrete architectural requirement.
+21. **Translate vendor errors at adapter boundaries.** Azure/OpenAI/provider exception types must not leak into domain/application behavior; expose small application-owned error contracts where callers need to react.
+22. **Generated fiscal documents are immutable artifacts.** Regeneration creates a new opaque document id/path; never overwrite a document the user may already have reviewed or downloaded.
 
 When multiple implementations are correct, choose the one with:
 
@@ -72,6 +74,8 @@ Do not confuse "enterprise architecture" with quality. This is a tiny product an
 13. Prefer one user-scoped partition for transactional user data unless a documented access/scale reason requires another partition strategy.
 14. Do not place sensitive personal data in logs, PartitionKeys, RowKeys, blob paths or telemetry dimensions when an opaque identifier can be used instead.
 15. The application must work against in-memory storage fakes in unit/domain tests.
+16. Generated fiscal document blobs are create-only and versioned; overwrite is forbidden.
+17. Adapter implementations must normalize provider-specific conflicts/not-found behavior into application-owned storage contracts when callers need consistent behavior.
 
 ## Required change discipline
 

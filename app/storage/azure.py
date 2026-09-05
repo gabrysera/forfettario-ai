@@ -1,13 +1,12 @@
 from collections.abc import Mapping
-from typing import Any
 
-from azure.core.exceptions import ResourceNotFoundError
+from azure.core.exceptions import ResourceExistsError, ResourceNotFoundError
 from azure.data.tables import UpdateMode
 from azure.data.tables.aio import TableClient
 from azure.storage.blob import ContentSettings
 from azure.storage.blob.aio import ContainerClient
 
-from .ports import Entity
+from .ports import AuditEventAlreadyExists, DocumentAlreadyExists, Entity
 
 
 def _prefix_end(prefix: str) -> str:
@@ -33,9 +32,9 @@ class AzureTableUserStateRepository:
             return None
         return dict(entity)
 
-    async def upsert(self, user_id: str, row_key: str, values: Mapping[str, Any]) -> None:
+    async def upsert(self, user_id: str, row_key: str, values: Mapping[str, object]) -> None:
         await self._client.upsert_entity(
-            {"PartitionKey": user_id, "RowKey": row_key, **values},
+            {**values, "PartitionKey": user_id, "RowKey": row_key},
             mode=UpdateMode.REPLACE,
         )
 
@@ -55,8 +54,11 @@ class AzureTableAuditRepository:
     def __init__(self, client: TableClient) -> None:
         self._client = client
 
-    async def append(self, user_id: str, row_key: str, values: Mapping[str, Any]) -> None:
-        await self._client.create_entity({"PartitionKey": user_id, "RowKey": row_key, **values})
+    async def append(self, user_id: str, row_key: str, values: Mapping[str, object]) -> None:
+        try:
+            await self._client.create_entity({**values, "PartitionKey": user_id, "RowKey": row_key})
+        except ResourceExistsError as exc:
+            raise AuditEventAlreadyExists(row_key) from exc
 
     async def list(self, user_id: str) -> list[Entity]:
         entities = self._client.query_entities(
@@ -71,12 +73,15 @@ class AzureBlobDocumentStore:
         self._client = client
 
     async def put(self, path: str, data: bytes, content_type: str) -> None:
-        await self._client.upload_blob(
-            name=path,
-            data=data,
-            overwrite=True,
-            content_settings=ContentSettings(content_type=content_type),
-        )
+        try:
+            await self._client.upload_blob(
+                name=path,
+                data=data,
+                overwrite=False,
+                content_settings=ContentSettings(content_type=content_type),
+            )
+        except ResourceExistsError as exc:
+            raise DocumentAlreadyExists(path) from exc
 
     async def get(self, path: str) -> bytes | None:
         try:

@@ -14,6 +14,6 @@ __all__ = [
     "ReviewStatus",
     "SocialSecurityAssessment",
     "SourceReference",
-    "TaxpayerProfile",
     "TaxRegimeAssessment",
+    "TaxpayerProfile",
 ]
