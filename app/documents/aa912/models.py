@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class AA912OpeningData(BaseModel):
@@ -33,10 +33,23 @@ class AA912OpeningData(BaseModel):
     activity_description: str = "ATTIVITA DI PROGRAMMAZIONE INFORMATICA"
     declaration_date: date | None = None
 
+    @field_validator(
+        "fiscal_code",
+        "birth_province",
+        "residence_province",
+        "activity_province",
+        mode="before",
+    )
+    @classmethod
+    def uppercase_codes(cls, value: object) -> object:
+        return value.upper() if isinstance(value, str) else value
+
     @model_validator(mode="after")
     def validate_supported_path(self) -> Self:
         if self.ateco_code != "62.10.00":
             raise ValueError("v0 supports only ATECO 62.10.00")
+        if not self.accounting_records_at_activity_address:
+            raise ValueError("v0 supports records kept at the activity address only")
         if not self.activity_at_residence:
             fields = (
                 self.activity_address,
@@ -46,6 +59,8 @@ class AA912OpeningData(BaseModel):
             )
             if any(value is None or value == "" for value in fields):
                 raise ValueError("activity address is required when it differs from residence")
+        if self.declaration_date is not None and self.start_date > self.declaration_date:
+            raise ValueError("start date cannot be after declaration date")
         return self
 
     @property
