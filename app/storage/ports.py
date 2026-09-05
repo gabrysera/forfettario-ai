@@ -12,6 +12,10 @@ class AuditEventAlreadyExists(StorageConflictError):
     """Raised when an append-only audit event key is reused."""
 
 
+class DocumentAlreadyExists(StorageConflictError):
+    """Raised when immutable document content would be overwritten."""
+
+
 class UserStateRepository(Protocol):
     async def get(self, user_id: str, row_key: str) -> Entity | None: ...
 
@@ -27,6 +31,8 @@ class AuditRepository(Protocol):
 
 
 class DocumentStore(Protocol):
-    async def put(self, path: str, data: bytes, content_type: str) -> None: ...
+    async def put(self, path: str, data: bytes, content_type: str) -> None:
+        """Create an immutable document; fail if the path already exists."""
+        ...
 
     async def get(self, path: str) -> bytes | None: ...
