@@ -10,13 +10,30 @@ from app.documents.aa912 import build_aa912_draft, render_aa912, validate_templa
 from app.documents.aa912.models import AA912OpeningProfile
 from app.documents.aa912.renderer import DocumentOverflowError
 from app.documents.aa912.template import InvalidAA912Template
+from app.tax_engine.forfettario_2026 import ForfettarioFacts, assess_forfettario_access
+from app.tax_engine.types import ConditionStatus
 from app.web.templates import templates
 
 router = APIRouter()
 _DEFAULT_TEMPLATE_PATH = Path("data/templates/aa912.pdf")
+_CONDITION_LABELS = {
+    "FORF-ACCESS-001": "ricavi o compensi dell'anno precedente",
+    "FORF-ACCESS-002": "spese per lavoro dell'anno precedente",
+    "FORF-EXCL-001": "eventuali regimi IVA o reddituali speciali",
+    "FORF-EXCL-002": "residenza fiscale",
+    "FORF-EXCL-003": "cessioni prevalenti di immobili, terreni o veicoli nuovi",
+    "FORF-EXCL-004": "partecipazioni in società, associazioni o imprese familiari",
+    "FORF-EXCL-005": "controllo di società collegate all'attività",
+    "FORF-EXCL-006": "attività prevalente verso datore di lavoro attuale o recente",
+    "FORF-EXCL-007": "redditi da lavoro dipendente dell'anno precedente",
+}
 
 
 class InvalidFormData(ValueError):
+    pass
+
+
+class UnsupportedOpeningCase(ValueError):
     pass
 
 
@@ -31,11 +48,14 @@ async def generate_aa912(request: Request) -> Response:
     values = {key: str(value) for key, value in form.items()}
 
     try:
+        _require_supported_opening(values)
         profile = AA912OpeningProfile.model_validate(_profile_values(values))
         template = validate_template(_template_path().read_bytes())
         pdf = render_aa912(template, build_aa912_draft(profile))
     except InvalidFormData:
         return _form_response(request, values, "Completa tutti i campi richiesti.", 422)
+    except UnsupportedOpeningCase as exc:
+        return _form_response(request, values, str(exc), 422)
     except ValidationError as exc:
         return _form_response(request, values, _validation_message(exc), 422)
     except (FileNotFoundError, InvalidAA912Template):
@@ -57,6 +77,57 @@ async def generate_aa912(request: Request) -> Response:
         content=pdf,
         media_type="application/pdf",
         headers={"Content-Disposition": 'attachment; filename="aa9-12-da-controllare.pdf"'},
+    )
+
+
+def _require_supported_opening(values: dict[str, str]) -> None:
+    if not _required_bool(values, "confirms_software_activity"):
+        raise UnsupportedOpeningCase(
+            "La v0 automatica supporta solo l'attività prevalente di programmazione software. "
+            "Il PDF non è stato generato."
+        )
+
+    facts = ForfettarioFacts.model_validate(
+        {
+            "previous_year_revenue": _required(values, "previous_year_revenue"),
+            "previous_year_labor_costs": _required(values, "previous_year_labor_costs"),
+            "uses_special_vat_or_income_regime": _required_bool(
+                values, "uses_special_vat_or_income_regime"
+            ),
+            "italian_tax_resident": _required_bool(values, "italian_tax_resident"),
+            "prevalently_sells_real_estate_land_or_new_vehicles": _required_bool(
+                values, "prevalently_sells_real_estate_land_or_new_vehicles"
+            ),
+            "participates_in_partnership_association_or_family_business": _required_bool(
+                values, "participates_in_partnership_association_or_family_business"
+            ),
+            "controls_related_limited_company": _required_bool(
+                values, "controls_related_limited_company"
+            ),
+            "works_prevalently_for_current_or_recent_employer": _required_bool(
+                values, "works_prevalently_for_current_or_recent_employer"
+            ),
+            "previous_year_employment_income": _required(
+                values, "previous_year_employment_income"
+            ),
+            "employment_relationship_ended": _required_bool(
+                values, "employment_relationship_ended"
+            ),
+        }
+    )
+    assessment = assess_forfettario_access(facts)
+    if assessment.eligible is True:
+        return
+
+    issues = [
+        _CONDITION_LABELS.get(condition.condition_id, condition.condition_id)
+        for condition in assessment.conditions
+        if condition.status is not ConditionStatus.PASS
+    ]
+    details = ", ".join(issues)
+    raise UnsupportedOpeningCase(
+        "Le risposte non permettono di validare automaticamente l'accesso al regime forfettario. "
+        f"Da verificare: {details}. Il PDF non è stato generato."
     )
 
 
@@ -167,6 +238,11 @@ def _required_bool(values: dict[str, str], field: str) -> bool:
 def _validation_message(exc: ValidationError) -> str:
     field = ".".join(str(part) for part in exc.errors()[0]["loc"])
     messages = {
+        "previous_year_revenue": "Controlla ricavi o compensi dell'anno precedente.",
+        "previous_year_labor_costs": "Controlla le spese per lavoro dell'anno precedente.",
+        "previous_year_employment_income": (
+            "Controlla il reddito da lavoro dipendente dell'anno precedente."
+        ),
         "fiscal_code": "Controlla il codice fiscale.",
         "birth_province": "Controlla la provincia di nascita.",
         "residence.postal_code": "Inserisci un CAP di 5 cifre.",
