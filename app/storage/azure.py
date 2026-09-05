@@ -6,7 +6,7 @@ from azure.data.tables.aio import TableClient
 from azure.storage.blob import ContentSettings
 from azure.storage.blob.aio import ContainerClient
 
-from .ports import AuditEventAlreadyExists, Entity
+from .ports import AuditEventAlreadyExists, DocumentAlreadyExists, Entity
 
 
 def _prefix_end(prefix: str) -> str:
@@ -73,12 +73,15 @@ class AzureBlobDocumentStore:
         self._client = client
 
     async def put(self, path: str, data: bytes, content_type: str) -> None:
-        await self._client.upload_blob(
-            name=path,
-            data=data,
-            overwrite=True,
-            content_settings=ContentSettings(content_type=content_type),
-        )
+        try:
+            await self._client.upload_blob(
+                name=path,
+                data=data,
+                overwrite=False,
+                content_settings=ContentSettings(content_type=content_type),
+            )
+        except ResourceExistsError as exc:
+            raise DocumentAlreadyExists(path) from exc
 
     async def get(self, path: str) -> bytes | None:
         try:
