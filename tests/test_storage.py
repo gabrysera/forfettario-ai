@@ -22,6 +22,30 @@ async def test_user_state_is_partitioned_and_prefix_queryable() -> None:
 
 
 @pytest.mark.asyncio
+async def test_repository_keys_cannot_be_overridden_by_payload() -> None:
+    repository = InMemoryUserStateRepository()
+
+    await repository.upsert(
+        "user-a",
+        "PROFILE",
+        {"PartitionKey": "attacker", "RowKey": "OTHER", "schema_version": 1},
+    )
+
+    entity = await repository.get("user-a", "PROFILE")
+    assert entity is not None
+    assert entity["PartitionKey"] == "user-a"
+    assert entity["RowKey"] == "PROFILE"
+
+
+@pytest.mark.asyncio
+async def test_empty_prefix_is_rejected_consistently() -> None:
+    repository = InMemoryUserStateRepository()
+
+    with pytest.raises(ValueError, match="must not be empty"):
+        await repository.list_prefix("user-a", "")
+
+
+@pytest.mark.asyncio
 async def test_audit_events_are_append_only() -> None:
     repository = InMemoryAuditRepository()
 
