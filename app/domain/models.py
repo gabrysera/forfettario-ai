@@ -2,7 +2,7 @@ from datetime import date
 from enum import StrEnum
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 
 
 class Model(BaseModel):
@@ -46,11 +46,4 @@ class SocialSecurityAssessment(Model):
     tax_year: int
     review_status: ReviewStatus
     scheme: str | None = None
-    source_ids: tuple[str, ...] = ()
-
-
-class AA912Draft(Model):
-    taxpayer_id: UUID
-    review_status: ReviewStatus
-    fields: dict[str, str] = Field(default_factory=dict)
     source_ids: tuple[str, ...] = ()

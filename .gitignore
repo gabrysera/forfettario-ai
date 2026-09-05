@@ -12,6 +12,7 @@ coverage/
 htmlcov/
 playwright-report/
 test-results/
+data/templates/*.pdf
 .env
 .env.*
 !.env.example

@@ -1,0 +1,43 @@
+{
+  "fiscal_code": "RSSMRA80A01H501U",
+  "surname": "Rossi",
+  "given_name": "Mario",
+  "birth_date": "1980-01-01",
+  "birth_municipality": "Roma",
+  "birth_province": "RM",
+  "residence": {
+    "address": "Via Esempio 10",
+    "postal_code": "00100",
+    "municipality": "Roma",
+    "province": "RM"
+  },
+  "activity_at_residence": true,
+  "activity_address": null,
+  "records_at_activity_address": true,
+  "start_date": "2026-09-05",
+  "declaration_date": "2026-09-05",
+  "email": "mario.rossi@example.test",
+  "phone_prefix": "+39",
+  "phone_number": "061234567",
+  "fax_prefix": null,
+  "fax_number": null,
+  "website": null,
+  "activity_property": {
+    "tenure": "P",
+    "cadastre_type": "F",
+    "section": null,
+    "sheet": "123",
+    "parcel": "456",
+    "subunit": "7",
+    "contract_registration_date": null,
+    "contract_registration_office": null,
+    "contract_registration_number": null,
+    "contract_registration_subnumber": null,
+    "contract_registration_series": null
+  },
+  "intra_eu": {
+    "wants_vies": false,
+    "expected_purchases": null,
+    "expected_sales": null
+  }
+}
