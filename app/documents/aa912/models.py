@@ -106,7 +106,7 @@ class AA912OpeningProfile(Model):
     fax_prefix: str | None = Field(default=None, max_length=8)
     fax_number: str | None = Field(default=None, max_length=20)
     website: str | None = Field(default=None, max_length=160)
-    property: PropertyDetails
+    activity_property: PropertyDetails
     intra_eu: IntraEUPlan
 
     @field_validator("fiscal_code", "birth_province", mode="before")
@@ -178,7 +178,7 @@ class AA912Draft(Model):
     fax_prefix: str | None
     fax_number: str | None
     website: str | None
-    property: PropertyDetails
+    activity_property: PropertyDetails
     intra_eu: IntraEUPlan
     compiled_sections: tuple[str, ...]
     total_pages: int
