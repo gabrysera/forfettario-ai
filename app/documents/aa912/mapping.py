@@ -1,8 +1,8 @@
 from .models import (
-    AA912Draft,
-    AA912OpeningProfile,
     SUPPORTED_ACTIVITY_DESCRIPTION,
     SUPPORTED_ATECO_CODE,
+    AA912Draft,
+    AA912OpeningProfile,
 )
 
 _FORFETTARIO_REGIME_CODE = "2"
