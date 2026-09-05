@@ -20,7 +20,7 @@ def test_supported_home_owned_case_maps_deterministically() -> None:
 
 def test_rented_property_requires_registration_details() -> None:
     data = profile("aa912_home_rented_no_vies.json").model_dump(mode="json")
-    data["property"]["contract_registration_number"] = None
+    data["activity_property"]["contract_registration_number"] = None
 
     with pytest.raises(ValidationError):
         AA912OpeningProfile.model_validate(data)
