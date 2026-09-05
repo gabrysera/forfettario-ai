@@ -36,16 +36,87 @@
   <main>
     <p><a href="/">Forfettario AI</a></p>
     <h1>Apri la tua Partita IVA</h1>
-    <p>Rispondi alle domande e genera il modello AA9/12 ufficiale già compilato. L'app non firma e non invia nulla al posto tuo.</p>
+    <p>Rispondi alle domande e genera il modello AA9/12 ufficiale già compilato. L'app verifica deterministicamente il percorso supportato, non firma e non invia nulla al posto tuo.</p>
 
     {% if error %}<div class="error" role="alert">{{ error }}</div>{% endif %}
 
     <form method="post" action="/opening/aa912.pdf">
       <h2>Attività</h2>
-      <div class="fixed">Sviluppo software - ATECO 62.10.00 - regime forfettario</div>
+      <div class="fixed">Percorso supportato: programmazione software - ATECO 62.10.00 - regime forfettario</div>
+      <fieldset>
+        <legend>Confermi che la tua attività prevalente sarà programmazione/sviluppo software?</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="confirms_software_activity" value="yes" required {% if values.get('confirms_software_activity') == 'yes' %}checked{% endif %}> Sì</label>
+          <label class="choice"><input type="radio" name="confirms_software_activity" value="no" required {% if values.get('confirms_software_activity') == 'no' %}checked{% endif %}> No</label>
+        </div>
+      </fieldset>
       <label>Quando inizi l'attività?
         <input type="date" name="start_date" required value="{{ values.get('start_date', '') }}">
       </label>
+
+      <h2>Verifica del percorso forfettario</h2>
+      <p class="muted">Queste risposte vengono valutate dal motore fiscale deterministico. Il PDF viene generato solo se tutte le condizioni del percorso supportato risultano verificate.</p>
+      <div class="grid">
+        <label>Ricavi o compensi dell'anno precedente (€)
+          <input type="number" min="0" step="0.01" name="previous_year_revenue" required value="{{ values.get('previous_year_revenue', '') }}">
+        </label>
+        <label>Spese per dipendenti/collaboratori nell'anno precedente (€)
+          <input type="number" min="0" step="0.01" name="previous_year_labor_costs" required value="{{ values.get('previous_year_labor_costs', '') }}">
+        </label>
+        <label>Reddito da lavoro dipendente/pensione dell'anno precedente (€)
+          <input type="number" min="0" step="0.01" name="previous_year_employment_income" required value="{{ values.get('previous_year_employment_income', '') }}">
+        </label>
+      </div>
+
+      <fieldset>
+        <legend>Sei fiscalmente residente in Italia?</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="italian_tax_resident" value="yes" required {% if values.get('italian_tax_resident') == 'yes' %}checked{% endif %}> Sì</label>
+          <label class="choice"><input type="radio" name="italian_tax_resident" value="no" required {% if values.get('italian_tax_resident') == 'no' %}checked{% endif %}> No</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Applichi un regime IVA speciale o un regime speciale di determinazione del reddito?</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="uses_special_vat_or_income_regime" value="yes" required {% if values.get('uses_special_vat_or_income_regime') == 'yes' %}checked{% endif %}> Sì</label>
+          <label class="choice"><input type="radio" name="uses_special_vat_or_income_regime" value="no" required {% if values.get('uses_special_vat_or_income_regime') == 'no' %}checked{% endif %}> No</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Svolgi prevalentemente cessioni di immobili, terreni edificabili o mezzi di trasporto nuovi?</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="prevalently_sells_real_estate_land_or_new_vehicles" value="yes" required {% if values.get('prevalently_sells_real_estate_land_or_new_vehicles') == 'yes' %}checked{% endif %}> Sì</label>
+          <label class="choice"><input type="radio" name="prevalently_sells_real_estate_land_or_new_vehicles" value="no" required {% if values.get('prevalently_sells_real_estate_land_or_new_vehicles') == 'no' %}checked{% endif %}> No</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Partecipi a società di persone, associazioni professionali o imprese familiari?</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="participates_in_partnership_association_or_family_business" value="yes" required {% if values.get('participates_in_partnership_association_or_family_business') == 'yes' %}checked{% endif %}> Sì</label>
+          <label class="choice"><input type="radio" name="participates_in_partnership_association_or_family_business" value="no" required {% if values.get('participates_in_partnership_association_or_family_business') == 'no' %}checked{% endif %}> No</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Controlli una società a responsabilità limitata che svolge attività riconducibile alla tua?</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="controls_related_limited_company" value="yes" required {% if values.get('controls_related_limited_company') == 'yes' %}checked{% endif %}> Sì</label>
+          <label class="choice"><input type="radio" name="controls_related_limited_company" value="no" required {% if values.get('controls_related_limited_company') == 'no' %}checked{% endif %}> No</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Lavorerai prevalentemente per il tuo datore di lavoro attuale o dei due anni precedenti, o per soggetti a esso riconducibili?</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="works_prevalently_for_current_or_recent_employer" value="yes" required {% if values.get('works_prevalently_for_current_or_recent_employer') == 'yes' %}checked{% endif %}> Sì</label>
+          <label class="choice"><input type="radio" name="works_prevalently_for_current_or_recent_employer" value="no" required {% if values.get('works_prevalently_for_current_or_recent_employer') == 'no' %}checked{% endif %}> No</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Il rapporto di lavoro da cui derivava l'eventuale reddito indicato sopra è terminato? Se non avevi un rapporto di lavoro, scegli No.</legend>
+        <div class="choices">
+          <label class="choice"><input type="radio" name="employment_relationship_ended" value="yes" required {% if values.get('employment_relationship_ended') == 'yes' %}checked{% endif %}> Sì</label>
+          <label class="choice"><input type="radio" name="employment_relationship_ended" value="no" required {% if values.get('employment_relationship_ended') == 'no' %}checked{% endif %}> No</label>
+        </div>
+      </fieldset>
 
       <h2>Dati personali</h2>
       <label>Codice fiscale
@@ -89,12 +160,12 @@
       <fieldset>
         <legend>Luogo principale dell'attività</legend>
         <div class="choices">
-          <label class="choice"><input type="radio" name="activity_at_residence" value="yes" required {% if values.get('activity_at_residence', 'yes') == 'yes' %}checked{% endif %}> Da casa</label>
+          <label class="choice"><input type="radio" name="activity_at_residence" value="yes" required {% if values.get('activity_at_residence') == 'yes' %}checked{% endif %}> Da casa</label>
           <label class="choice"><input type="radio" name="activity_at_residence" value="no" required {% if values.get('activity_at_residence') == 'no' %}checked{% endif %}> Da un altro luogo</label>
         </div>
       </fieldset>
 
-      <div id="activity-address" class="conditional grid" {% if values.get('activity_at_residence', 'yes') != 'no' %}hidden{% endif %}>
+      <div id="activity-address" class="conditional grid" {% if values.get('activity_at_residence') != 'no' %}hidden{% endif %}>
         <label style="grid-column: 1 / -1">Indirizzo del luogo di lavoro
           <input name="activity_address" value="{{ values.get('activity_address', '') }}">
         </label>
@@ -112,7 +183,7 @@
       <fieldset>
         <legend>Conserverai la documentazione fiscale nello stesso luogo in cui lavori?</legend>
         <div class="choices">
-          <label class="choice"><input type="radio" name="records_at_activity_address" value="yes" required {% if values.get('records_at_activity_address', 'yes') == 'yes' %}checked{% endif %}> Sì</label>
+          <label class="choice"><input type="radio" name="records_at_activity_address" value="yes" required {% if values.get('records_at_activity_address') == 'yes' %}checked{% endif %}> Sì</label>
           <label class="choice"><input type="radio" name="records_at_activity_address" value="no" required {% if values.get('records_at_activity_address') == 'no' %}checked{% endif %}> No</label>
         </div>
       </fieldset>
@@ -124,7 +195,7 @@
       </label>
       <div class="grid">
         <label>Prefisso telefono
-          <input name="phone_prefix" required placeholder="+39" value="{{ values.get('phone_prefix', '+39') }}">
+          <input name="phone_prefix" required placeholder="+39" value="{{ values.get('phone_prefix', '') }}">
         </label>
         <label>Numero telefono
           <input name="phone_number" required inputmode="tel" value="{{ values.get('phone_number', '') }}">
@@ -145,14 +216,15 @@
       <fieldset>
         <legend>Come utilizzi questo immobile?</legend>
         <div class="choices">
-          <label class="choice"><input type="radio" name="property_tenure" value="P" required {% if values.get('property_tenure', 'P') == 'P' %}checked{% endif %}> Proprietà / altro possesso</label>
+          <label class="choice"><input type="radio" name="property_tenure" value="P" required {% if values.get('property_tenure') == 'P' %}checked{% endif %}> Proprietà / altro possesso</label>
           <label class="choice"><input type="radio" name="property_tenure" value="D" required {% if values.get('property_tenure') == 'D' %}checked{% endif %}> Affitto o comodato</label>
         </div>
       </fieldset>
       <div class="grid">
         <label>Tipo catasto
           <select name="cadastre_type" required>
-            <option value="F" {% if values.get('cadastre_type', 'F') == 'F' %}selected{% endif %}>Fabbricato</option>
+            <option value="" disabled {% if not values.get('cadastre_type') %}selected{% endif %}>Seleziona</option>
+            <option value="F" {% if values.get('cadastre_type') == 'F' %}selected{% endif %}>Fabbricato</option>
             <option value="T" {% if values.get('cadastre_type') == 'T' %}selected{% endif %}>Terreno</option>
           </select>
         </label>
@@ -170,7 +242,7 @@
         </label>
       </div>
 
-      <div id="contract" class="conditional" {% if values.get('property_tenure', 'P') != 'D' %}hidden{% endif %}>
+      <div id="contract" class="conditional" {% if values.get('property_tenure') != 'D' %}hidden{% endif %}>
         <p class="muted">Per affitto o comodato servono gli estremi di registrazione del contratto.</p>
         <div class="grid">
           <label>Data registrazione
@@ -195,11 +267,11 @@
       <fieldset>
         <legend>Vuoi richiedere l'inclusione nel VIES per effettuare operazioni intracomunitarie?</legend>
         <div class="choices">
-          <label class="choice"><input type="radio" name="wants_vies" value="no" required {% if values.get('wants_vies', 'no') == 'no' %}checked{% endif %}> No</label>
+          <label class="choice"><input type="radio" name="wants_vies" value="no" required {% if values.get('wants_vies') == 'no' %}checked{% endif %}> No</label>
           <label class="choice"><input type="radio" name="wants_vies" value="yes" required {% if values.get('wants_vies') == 'yes' %}checked{% endif %}> Sì</label>
         </div>
       </fieldset>
-      <div id="vies" class="conditional grid" {% if values.get('wants_vies', 'no') != 'yes' %}hidden{% endif %}>
+      <div id="vies" class="conditional grid" {% if values.get('wants_vies') != 'yes' %}hidden{% endif %}>
         <label>Acquisti UE previsti in un anno (€)
           <input name="expected_eu_purchases" inputmode="numeric" value="{{ values.get('expected_eu_purchases', '') }}">
         </label>
@@ -209,8 +281,8 @@
       </div>
 
       <h2>Controllo e firma</h2>
-      <label>Data della dichiarazione
-        <input type="date" name="declaration_date" value="{{ values.get('declaration_date', today) }}">
+      <label>Data della dichiarazione <span class="muted">(opzionale nel draft)</span>
+        <input type="date" name="declaration_date" value="{{ values.get('declaration_date', '') }}">
       </label>
       <p class="muted">La firma rimane vuota. Dopo il download controlla il PDF prima di firmarlo e presentarlo.</p>
 
