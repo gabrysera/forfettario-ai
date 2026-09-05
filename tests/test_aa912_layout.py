@@ -22,6 +22,11 @@ def test_quadro_i_fields_are_on_physical_page_four() -> None:
     assert {field.page for field in fields} == {4}
 
 
+def test_vies_volumes_stay_inside_the_operations_row() -> None:
+    assert layout.EU_PURCHASES.top == 559.0
+    assert layout.EU_SALES.top == 559.0
+
+
 def test_signature_summary_includes_quadro_i() -> None:
     assert layout.COMPILED_SECTION_MARKS["I"].page == 5
     assert layout.TOTAL_PAGES.page == 5
