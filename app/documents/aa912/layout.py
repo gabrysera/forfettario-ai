@@ -92,8 +92,8 @@ CONTRACT_OFFICE = TextField(4, 362.0, 539.0, 40.0, 7.5)
 CONTRACT_NUMBER = TextField(4, 406.0, 539.0, 80.0, 7.5)
 CONTRACT_SUBNUMBER = TextField(4, 492.0, 539.0, 38.0, 7.5)
 CONTRACT_SERIES = TextField(4, 535.0, 539.0, 12.0, 7.5)
-EU_PURCHASES = BoxedField(4, 115.0, 568.0, 9, 12.0, 7.5)
-EU_SALES = BoxedField(4, 312.0, 568.0, 9, 12.0, 7.5)
+EU_PURCHASES = BoxedField(4, 115.0, 559.0, 9, 12.0, 7.5)
+EU_SALES = BoxedField(4, 312.0, 559.0, 9, 12.0, 7.5)
 
 # Page 5 - compiled sections and signature area.
 COMPILED_SECTION_MARKS = {
