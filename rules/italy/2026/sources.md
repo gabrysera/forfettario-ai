@@ -6,6 +6,8 @@ This file is a registry, not an implementation of all rules. Fiscal constants an
 
 - ISTAT, ATECO 2025 explanatory notes — `62.10.00 Attività di programmazione informatica`
   - https://www.istat.it/wp-content/uploads/2025/03/Note-esplicative-ATECO-2025-italiano.pdf
+- ISTAT, ATECO 2007 classification — historical software-programming code `62.01.00 Produzione di software non connesso all'edizione`.
+  - https://www.istat.it/it/files//2022/03/volume_integrale_ATECO2007.pdf
 
 ## Regime forfettario — access and startup rate
 
@@ -47,8 +49,16 @@ Reviewed for the v0 opening slice on 2026-09-05.
     - Quadro I is used on initial registration for contact information and data about the property used for the prevalent activity;
     - property tenure code `P` means possession and `D` means detention (lease/loan); detention requires contract-registration details;
     - the intra-EU field expresses the intention to carry out intra-EU operations for VIES inclusion;
-    - the client-type/public-place/initial-investment fields are restricted to the activity codes identified by the cited 2006/2008 provisions and are not populated merely because they exist on the generic form;
+    - the client-type/public-place/initial-investment fields are restricted to the activity codes identified by the cited 2006/2008 provisions;
     - the declaration must be signed by the taxpayer or legal/negotiated representative. The v0 software never generates a signature.
+
+### Special Quadro I activity fields
+
+- Agenzia delle Entrate — Provvedimento del 21 December 2006, art. 1.1(f), as replaced by the 14 January 2008 provision after adoption of ATECO 2007.
+  - official finance-administration text for the 21 December 2006 provision:
+    - https://def.finanze.it/DocTribFrontend/getArticoloDetailFromResultList.do?codiceOrdinamento=200000100000000&id=%7BAD33A10F-EA58-41F9-9A11-AE01D3DC7B58%7D&idAttoNormativo=%7B6E702FAF-1CBF-404E-9F38-FFD8432CD9C9%7D
+  - 14 January 2008 replacement list: `46.49.90`, `46.76.90`, `46.90.00`, `47.59.99`, `47.78.99`, `63.99.00`, `74.90.99`, `82.99.99`.
+  - interpretation used by v0: the extra fields for prevalent customer type, public-facing place and first-year investments apply only to that special activity list. Software programming was `62.01.00` under ATECO 2007 and is `62.10.00` under ATECO 2025, so the supported software-programming path is outside this special list. Those fields remain blank and are not asked in the v0 UI.
 
 ### Compilation/control-software notice
 
