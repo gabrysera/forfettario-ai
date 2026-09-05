@@ -62,6 +62,7 @@ def test_unsupported_records_location_fails_closed(
 
     assert response.status_code == 422
     assert response.headers["content-type"].startswith("text/html")
+    assert "supporta solo la documentazione fiscale conservata nel luogo" in response.text
 
 
 def test_missing_official_template_is_reported_as_service_unavailable(
