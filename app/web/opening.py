@@ -3,6 +3,7 @@ from datetime import date
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import HTMLResponse
 from pydantic import ValidationError
+from starlette.datastructures import FormData
 
 from app.documents.aa912 import AA912OpeningData, render_aa912_opening
 from app.documents.aa912.template import AA912TemplateNotInstalled, load_aa912_template
@@ -28,12 +29,26 @@ async def generate_aa912(request: Request) -> Response:
     try:
         data = AA912OpeningData.model_validate(
             {
-                **values,
+                "fiscal_code": values.get("fiscal_code"),
+                "surname": values.get("surname"),
+                "given_name": values.get("given_name"),
+                "birth_date": values.get("birth_date"),
+                "birth_municipality": values.get("birth_municipality"),
+                "birth_province": values.get("birth_province"),
+                "residence_address": values.get("residence_address"),
+                "residence_postal_code": values.get("residence_postal_code"),
+                "residence_municipality": values.get("residence_municipality"),
+                "residence_province": values.get("residence_province"),
                 "activity_at_residence": _checked(form, "activity_at_residence"),
+                "activity_address": _optional(values, "activity_address"),
+                "activity_postal_code": _optional(values, "activity_postal_code"),
+                "activity_municipality": _optional(values, "activity_municipality"),
+                "activity_province": _optional(values, "activity_province"),
                 "accounting_records_at_activity_address": _checked(
                     form, "accounting_records_at_activity_address"
                 ),
-                "declaration_date": values.get("declaration_date") or None,
+                "start_date": values.get("start_date"),
+                "declaration_date": _optional(values, "declaration_date"),
             }
         )
         pdf = render_aa912_opening(load_aa912_template(), data)
@@ -58,8 +73,12 @@ async def generate_aa912(request: Request) -> Response:
     )
 
 
-def _checked(form: object, field: str) -> bool:
-    return getattr(form, "get")(field) == "on"
+def _checked(form: FormData, field: str) -> bool:
+    return form.get(field) == "on"
+
+
+def _optional(values: dict[str, str], field: str) -> str | None:
+    return values.get(field) or None
 
 
 def _validation_message(exc: ValidationError) -> str:
