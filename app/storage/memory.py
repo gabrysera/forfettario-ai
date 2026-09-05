@@ -13,12 +13,14 @@ class InMemoryUserStateRepository:
 
     async def upsert(self, user_id: str, row_key: str, values: Mapping[str, object]) -> None:
         self._entities[(user_id, row_key)] = {
+            **values,
             "PartitionKey": user_id,
             "RowKey": row_key,
-            **values,
         }
 
     async def list_prefix(self, user_id: str, row_key_prefix: str) -> list[Entity]:
+        if not row_key_prefix:
+            raise ValueError("row_key_prefix must not be empty")
         return [
             dict(entity)
             for (partition, row_key), entity in sorted(self._entities.items())
@@ -34,7 +36,11 @@ class InMemoryAuditRepository:
         key = (user_id, row_key)
         if key in self._entities:
             raise AuditEventAlreadyExists(row_key)
-        self._entities[key] = {"PartitionKey": user_id, "RowKey": row_key, **values}
+        self._entities[key] = {
+            **values,
+            "PartitionKey": user_id,
+            "RowKey": row_key,
+        }
 
     async def list(self, user_id: str) -> list[Entity]:
         return [
