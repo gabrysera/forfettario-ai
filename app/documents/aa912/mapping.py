@@ -32,7 +32,7 @@ def build_aa912_draft(profile: AA912OpeningProfile) -> AA912Draft:
         fax_prefix=profile.fax_prefix,
         fax_number=profile.fax_number,
         website=profile.website,
-        property=profile.property,
+        activity_property=profile.activity_property,
         intra_eu=profile.intra_eu,
         compiled_sections=_COMPILED_SECTIONS,
         total_pages=_TOTAL_DECLARATION_PAGES,
