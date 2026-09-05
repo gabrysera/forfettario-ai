@@ -25,13 +25,10 @@ class InvalidAA912Template(ValueError):
     pass
 
 
-SUPPORTED_TEMPLATE = TemplateProfile(  # fmt: skip
+SUPPORTED_TEMPLATE = TemplateProfile(
     template_id="aa9-12-2025-06-04",
     sha256="a75a7ddab209b5355dc0ab40f78e6ba27d43806140ab60de1f9c8857dc32c599",
-    source_url=(
-        "https://www.agenziaentrate.gov.it/portale/documents/d/guest/"
-        "modello-aa9_aa9_12-modello-pdf"
-    ),
+    source_url="https://www.agenziaentrate.gov.it/portale/documents/d/guest/modello-aa9_aa9_12-modello-pdf",
     page_count=5,
     page_width=595.276,
     page_height=841.89,
