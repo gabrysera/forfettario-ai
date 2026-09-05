@@ -16,5 +16,6 @@ test-results/
 .env.*
 !.env.example
 local.settings.json
+var/templates/
 .DS_Store
 *.log
