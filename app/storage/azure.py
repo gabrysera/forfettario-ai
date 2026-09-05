@@ -56,9 +56,7 @@ class AzureTableAuditRepository:
 
     async def append(self, user_id: str, row_key: str, values: Mapping[str, object]) -> None:
         try:
-            await self._client.create_entity(
-                {**values, "PartitionKey": user_id, "RowKey": row_key}
-            )
+            await self._client.create_entity({**values, "PartitionKey": user_id, "RowKey": row_key})
         except ResourceExistsError as exc:
             raise AuditEventAlreadyExists(row_key) from exc
 
