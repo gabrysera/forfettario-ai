@@ -9,6 +9,7 @@ from app.domain.fiscal_code import is_valid_fiscal_code
 
 SUPPORTED_ATECO_CODE = "62.10.00"
 SUPPORTED_ACTIVITY_DESCRIPTION = "ATTIVITA DI PROGRAMMAZIONE INFORMATICA"
+_MAX_EU_VOLUME = Decimal("999999999")
 
 
 class Model(BaseModel):
@@ -64,8 +65,15 @@ class PropertyDetails(Model):
 
 class IntraEUPlan(Model):
     wants_vies: bool
-    expected_purchases: Decimal | None = Field(default=None, ge=0)
-    expected_sales: Decimal | None = Field(default=None, ge=0)
+    expected_purchases: Decimal | None = Field(default=None, ge=0, le=_MAX_EU_VOLUME)
+    expected_sales: Decimal | None = Field(default=None, ge=0, le=_MAX_EU_VOLUME)
+
+    @field_validator("expected_purchases", "expected_sales")
+    @classmethod
+    def require_whole_euros(cls, value: Decimal | None) -> Decimal | None:
+        if value is not None and value != value.to_integral_value():
+            raise ValueError("AA9/12 intra-EU volumes must be whole euros")
+        return value
 
     @model_validator(mode="after")
     def validate_expected_volumes(self) -> Self:
