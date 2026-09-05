@@ -9,7 +9,7 @@ description = "AI-native tax copilot for simple Italian regime forfettario freel
 requires-python = ">=3.13,<3.14"
 dependencies = [
   "azure-data-tables>=12.7,<13",
-  "azure-functions>=1.23,<2",
+  "azure-functions>=1.23,<3",
   "azure-identity>=1.24,<2",
   "azure-storage-blob>=12.26,<13",
   "fastapi>=0.116,<1",
