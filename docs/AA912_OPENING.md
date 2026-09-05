@@ -24,6 +24,8 @@ Primary references:
    `https://www1.agenziaentrate.gov.it/modulistica/altri/aa9istrc_new.pdf`
 3. Agenzia delle Entrate — 4 June 2015 compilation/control-software notice, referring to technical specifications approved with provvedimento 75295/2015:
    `https://telematici.agenziaentrate.gov.it/Main/Avviso?id=20150604120456`
+4. Agenzia delle Entrate — 21 December 2006 / 14 January 2008 provisions defining the restricted activity list for the special Quadro I fields.
+5. ISTAT — ATECO 2007 and ATECO 2025 classifications used to prove that software programming is outside that restricted activity list.
 
 The exact PDF bytes supported by the renderer are additionally pinned by SHA-256 in `app/documents/aa912/template.py`.
 
@@ -64,7 +66,7 @@ The exact PDF bytes supported by the renderer are additionally pinned by SHA-256
 | contract registration details | Quadro I | user | conditional: required for `D` detention; date, office and number required; subnumber/series optional when absent |
 | VIES intent | Quadro I | user | user explicitly chooses whether to request inclusion for intra-EU operations |
 | expected intra-EU purchases/sales | Quadro I | user | conditional on VIES request; both values collected as whole euro amounts and may be zero |
-| special client/public-place/investment fields | Quadro I | unsupported/not applicable | not populated for this software-developer path; they are reserved by the instructions for the specified 2006/2008 activity-code list |
+| special client/public-place/investment fields | Quadro I | not applicable | not populated for this software-developer path; the official 2008 replacement list does not include software programming |
 | compiled sections | signature summary | deterministic | `A`, `B`, `C`, `I` for this path |
 | total declaration pages | signature summary | deterministic | `4`; physical PDF page 1 is the privacy notice, declaration pages are numbered 1–4 |
 | declaration date | signature summary | user | optional while drafting; if supplied it cannot precede the declared start date |
@@ -77,7 +79,30 @@ The official instructions state that Quadro I is used at initial registration, r
 
 The same instructions state that the intra-EU field is used by taxpayers who want to express the intention to carry out intra-EU operations for VIES inclusion.
 
-The additional Quadro I fields for customer type, place open to the public and initial investments are explicitly restricted to activities identified by the 21 December 2006 / 14 January 2008 provisions. They are not part of the supported software-programming path and must not be shown merely because they exist on the generic form.
+### Why the special activity fields are not asked
+
+The additional Quadro I fields for prevalent customer type, place open to the public and initial investments are explicitly restricted to activities identified by the 21 December 2006 provision as updated for ATECO 2007 by the 14 January 2008 provision.
+
+The 2008 replacement list is:
+
+- `46.49.90`
+- `46.76.90`
+- `46.90.00`
+- `47.59.99`
+- `47.78.99`
+- `63.99.00`
+- `74.90.99`
+- `82.99.99`
+
+Software programming was classified as `62.01.00` under ATECO 2007 and is `62.10.00` under ATECO 2025. It is therefore outside the restricted list. For the supported software-programming path, the customer-type/public-place/initial-investment fields stay blank and are not shown in onboarding.
+
+This conclusion is part of the supported-archetype contract, not a generic rule that those fields are always optional for every taxpayer.
+
+## Accounting-record location boundary
+
+The `SCRITTURE CONTABILI` checkbox is tied to the address shown in the relevant AA9/12 section. The official instructions also provide Quadro F for depositaries and other places where accounting records are kept.
+
+For that reason, v0 supports only records kept at the activity address. If the user says the documentation is stored elsewhere, the application does not improvise a second address or silently omit Quadro F: it fails closed and requires a more complete path.
 
 ## Template contract
 
