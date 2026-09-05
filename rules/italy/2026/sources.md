@@ -1,6 +1,6 @@
 # Italy 2026 — authoritative source registry
 
-This file is a registry, not yet an implementation of all rules.
+This file is a registry, not an implementation of all rules. Fiscal constants and document mappings must point back to the primary material recorded here or to a more specific rule document.
 
 ## Activity classification
 
@@ -25,10 +25,38 @@ See `forfettario.md` for stable rule IDs and exact v0 interpretations.
 - INPS Circular no. 8, 3 February 2026 — contribution rates for 2026.
   - https://www.inps.it/it/it/inps-comunica/atti/circolari-messaggi-e-normativa/dettaglio.circolari-e-messaggi.2026.02.circolare-numero-8-del-03-02-2026_15153.html
 
-## AA9/12
+## AA9/12 opening document
 
-- Agenzia delle Entrate — AA9/12 instructions / starting, changing or ceasing individual VAT activity.
+Reviewed for the v0 opening slice on 2026-09-05.
+
+### Official model
+
+- Agenzia delle Entrate — official AA9/12 model for individual businesses and self-employed workers.
+  - https://www.agenziaentrate.gov.it/portale/documents/d/guest/modello-aa9_aa9_12-modello-pdf
+  - supported PDF SHA-256: `a75a7ddab209b5355dc0ab40f78e6ba27d43806140ab60de1f9c8857dc32c599`
+  - renderer contract: five A4 pages with the exact fingerprint and expected geometry recorded in `app/documents/aa912/template.py`.
+  - interpretation: the PDF is treated as an immutable official background; any changed fingerprint is unsupported until deliberately reviewed and versioned.
+
+### Official instructions
+
+- Agenzia delle Entrate — AA9/12 instructions for starting, changing or ceasing individual VAT activity.
   - https://www1.agenziaentrate.gov.it/modulistica/altri/aa9istrc_new.pdf
+  - interpretation used by v0:
+    - the model is used by individual businesses and self-employed workers for start/change/cessation declarations;
+    - all declaration pages carry the taxpayer fiscal code and progressive page number;
+    - Quadro I is used on initial registration for contact information and data about the property used for the prevalent activity;
+    - property tenure code `P` means possession and `D` means detention (lease/loan); detention requires contract-registration details;
+    - the intra-EU field expresses the intention to carry out intra-EU operations for VIES inclusion;
+    - the client-type/public-place/initial-investment fields are restricted to the activity codes identified by the cited 2006/2008 provisions and are not populated merely because they exist on the generic form;
+    - the declaration must be signed by the taxpayer or legal/negotiated representative. The v0 software never generates a signature.
+
+### Compilation/control-software notice
+
+- Agenzia delle Entrate, 4 June 2015 — AA9/12 compilation and control software aligned with technical specifications approved by provvedimento no. 75295/2015.
+  - https://telematici.agenziaentrate.gov.it/Main/Avviso?id=20150604120456
+  - interpretation used by v0: the forfettario selection is supported by the official AA9/12 compilation path and, when selected, volume of business is not entered in that field set.
+
+The field-by-field supported mapping is documented in `docs/AA912_OPENING.md`.
 
 ## Stamp duty on electronic invoices
 
