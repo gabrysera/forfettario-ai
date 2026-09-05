@@ -99,7 +99,9 @@ def _form_data() -> dict[str, str]:
         "activity_at_residence": "yes",
         "records_at_activity_address": "yes",
         "start_date": opening.start_date.isoformat(),
-        "declaration_date": opening.declaration_date.isoformat() if opening.declaration_date else "",
+        "declaration_date": opening.declaration_date.isoformat()
+        if opening.declaration_date
+        else "",
         "email": opening.email,
         "phone_prefix": opening.phone_prefix,
         "phone_number": opening.phone_number,
