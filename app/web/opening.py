@@ -1,4 +1,5 @@
 import os
+from datetime import date
 from pathlib import Path
 
 from fastapi import APIRouter, Request, Response
@@ -9,7 +10,7 @@ from app.documents.aa912 import build_aa912_draft, render_aa912, validate_templa
 from app.documents.aa912.models import AA912OpeningProfile
 from app.documents.aa912.renderer import DocumentOverflowError
 from app.documents.aa912.template import InvalidAA912Template
-from app.tax_engine.forfettario_2026 import ForfettarioFacts, assess_forfettario_access
+from app.tax_engine.forfettario_2026 import TAX_YEAR, ForfettarioFacts, assess_forfettario_access
 from app.tax_engine.types import ConditionStatus
 from app.web.templates import templates
 
@@ -47,8 +48,8 @@ async def generate_aa912(request: Request) -> Response:
     values = {key: str(value) for key, value in form.items()}
 
     try:
-        _require_supported_opening(values)
         profile = AA912OpeningProfile.model_validate(_profile_values(values))
+        _require_supported_opening(values, profile.start_date)
         template = validate_template(_template_path().read_bytes())
         pdf = render_aa912(template, build_aa912_draft(profile))
     except InvalidFormData:
@@ -79,7 +80,12 @@ async def generate_aa912(request: Request) -> Response:
     )
 
 
-def _require_supported_opening(values: dict[str, str]) -> None:
+def _require_supported_opening(values: dict[str, str], start_date: date) -> None:
+    if start_date.year != TAX_YEAR:
+        raise UnsupportedOpeningCase(
+            f"La v0 automatica applica il ruleset fiscale {TAX_YEAR} e supporta solo attività "
+            f"con data di inizio nel {TAX_YEAR}. Il PDF non è stato generato."
+        )
     if not _required_bool(values, "confirms_software_activity"):
         raise UnsupportedOpeningCase(
             "La v0 automatica supporta solo l'attività prevalente di programmazione software. "
