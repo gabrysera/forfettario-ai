@@ -1,5 +1,4 @@
 from .models import (
-    AA912Draft,
     ActivityClassification,
     ReviewStatus,
     SocialSecurityAssessment,
@@ -9,7 +8,6 @@ from .models import (
 )
 
 __all__ = [
-    "AA912Draft",
     "ActivityClassification",
     "ReviewStatus",
     "SocialSecurityAssessment",
