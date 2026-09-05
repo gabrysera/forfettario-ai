@@ -24,7 +24,7 @@ def test_renderer_overlays_confirmed_data_without_changing_page_count() -> None:
 
     assert len(reader.pages) == 5
     page_two = reader.pages[1].extract_text()
-    assert "SERAFINI GABRIELE" in page_two
+    assert "ROSSI MARIO" in page_two
     assert "ATTIVITA DI PROGRAMMAZIONE INFORMATICA" in page_two
     assert "VIA PIAVE 7/1" in page_two
     assert "CARUGO" in page_two
