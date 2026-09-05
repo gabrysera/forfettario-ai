@@ -4,6 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.tax_engine.types import Assessment, ConditionResult, ConditionStatus
 
+TAX_YEAR = 2026
 REVENUE_LIMIT = Decimal("85000")
 LABOR_COST_LIMIT = Decimal("20000")
 EMPLOYMENT_INCOME_LIMIT = Decimal("35000")
