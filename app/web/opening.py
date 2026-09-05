@@ -16,6 +16,10 @@ router = APIRouter()
 _DEFAULT_TEMPLATE_PATH = Path("data/templates/aa912.pdf")
 
 
+class InvalidFormData(ValueError):
+    pass
+
+
 @router.get("/opening", response_class=HTMLResponse)
 async def opening_form(request: Request) -> Response:
     return _form_response(request, values={})
@@ -30,6 +34,8 @@ async def generate_aa912(request: Request) -> Response:
         profile = AA912OpeningProfile.model_validate(_profile_values(values))
         template = validate_template(_template_path().read_bytes())
         pdf = render_aa912(template, build_aa912_draft(profile))
+    except InvalidFormData:
+        return _form_response(request, values, "Completa tutti i campi richiesti.", 422)
     except ValidationError as exc:
         return _form_response(request, values, _validation_message(exc), 422)
     except (FileNotFoundError, InvalidAA912Template):
@@ -143,7 +149,7 @@ def _template_path() -> Path:
 def _required(values: dict[str, str], field: str) -> str:
     value = values.get(field, "").strip()
     if not value:
-        raise ValueError(f"missing required form field: {field}")
+        raise InvalidFormData(field)
     return value
 
 
@@ -154,7 +160,7 @@ def _optional(values: dict[str, str], field: str) -> str | None:
 def _required_bool(values: dict[str, str], field: str) -> bool:
     value = _required(values, field)
     if value not in {"yes", "no"}:
-        raise ValueError(f"invalid boolean form field: {field}")
+        raise InvalidFormData(field)
     return value == "yes"
 
 
