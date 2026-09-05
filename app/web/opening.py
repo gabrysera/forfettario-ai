@@ -42,14 +42,14 @@ async def generate_aa912(request: Request) -> Response:
         return _form_response(
             request,
             values,
-            "Il modello AA9/12 ufficiale non è installato o non corrisponde alla versione supportata.",
+            "Il modello AA9/12 ufficiale non è disponibile o non è la versione supportata.",
             503,
         )
     except DocumentOverflowError:
         return _form_response(
             request,
             values,
-            "Uno dei dati inseriti non entra nel campo previsto dal modello AA9/12. Controlla i dati.",
+            "Un dato non entra nel relativo campo AA9/12. Controlla i dati inseriti.",
             422,
         )
 
