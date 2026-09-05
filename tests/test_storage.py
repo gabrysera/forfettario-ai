@@ -5,6 +5,7 @@ from app.storage.memory import (
     InMemoryDocumentStore,
     InMemoryUserStateRepository,
 )
+from app.storage.ports import AuditEventAlreadyExists
 
 
 @pytest.mark.asyncio
@@ -26,7 +27,7 @@ async def test_audit_events_are_append_only() -> None:
 
     await repository.append("user-a", "2026-09-04T00:00:00Z#1", {"event_type": "Example"})
 
-    with pytest.raises(ValueError, match="already exists"):
+    with pytest.raises(AuditEventAlreadyExists):
         await repository.append(
             "user-a",
             "2026-09-04T00:00:00Z#1",
