@@ -85,9 +85,11 @@ def _quadro_i(pdf: Canvas, draft: AA912Draft) -> None:
     property_details = draft.property
 
     _text(pdf, layout.EMAIL, draft.email)
-    _text(pdf, layout.PHONE, draft.phone)
-    if draft.fax:
-        _text(pdf, layout.FAX, draft.fax)
+    _text(pdf, layout.PHONE_PREFIX, draft.phone_prefix)
+    _text(pdf, layout.PHONE_NUMBER, draft.phone_number)
+    if draft.fax_prefix is not None and draft.fax_number is not None:
+        _text(pdf, layout.FAX_PREFIX, draft.fax_prefix)
+        _text(pdf, layout.FAX_NUMBER, draft.fax_number)
     if draft.website:
         _text(pdf, layout.WEBSITE, draft.website)
 
