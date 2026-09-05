@@ -25,7 +25,7 @@ class InvalidAA912Template(ValueError):
     pass
 
 
-SUPPORTED_TEMPLATE = TemplateProfile(
+SUPPORTED_TEMPLATE = TemplateProfile(  # fmt: skip
     template_id="aa9-12-2025-06-04",
     sha256="a75a7ddab209b5355dc0ab40f78e6ba27d43806140ab60de1f9c8857dc32c599",
     source_url=(
@@ -50,9 +50,7 @@ def validate_template(
 
     reader = PdfReader(BytesIO(pdf))
     if len(reader.pages) != profile.page_count:
-        raise InvalidAA912Template(
-            f"expected {profile.page_count} pages, got {len(reader.pages)}"
-        )
+        raise InvalidAA912Template(f"expected {profile.page_count} pages, got {len(reader.pages)}")
 
     for page_number, page in enumerate(reader.pages, start=1):
         width = float(page.mediabox.width)
