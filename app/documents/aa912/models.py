@@ -126,14 +126,19 @@ class AA912OpeningProfile(Model):
             raise ValueError("invalid email address")
         return value
 
+    @field_validator("records_at_activity_address")
+    @classmethod
+    def require_supported_records_location(cls, value: bool) -> bool:
+        if not value:
+            raise ValueError("v0 supports records kept at the activity address only")
+        return value
+
     @model_validator(mode="after")
     def validate_supported_path(self) -> Self:
         if not self.activity_at_residence and self.activity_address is None:
             raise ValueError("activity address is required when it differs from residence")
         if self.activity_at_residence and self.activity_address is not None:
             raise ValueError("activity address must be omitted when activity is at residence")
-        if not self.records_at_activity_address:
-            raise ValueError("v0 supports records kept at the activity address only")
         if self.declaration_date is not None and self.start_date > self.declaration_date:
             raise ValueError("start date cannot be after declaration date")
         if (self.fax_prefix is None) != (self.fax_number is None):
