@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Apri Partita IVA - Forfettario AI</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color-scheme: light; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #fafafa; color: #161616; }
+    main { max-width: 44rem; margin: 4rem auto; padding: 0 1.25rem 5rem; }
+    h1 { font-size: clamp(2rem, 6vw, 3.5rem); letter-spacing: -.045em; margin: 0 0 .5rem; }
+    h2 { font-size: 1rem; margin: 2rem 0 1rem; }
+    p { color: #666; line-height: 1.5; }
+    form { display: grid; gap: .9rem; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; }
+    label { display: grid; gap: .35rem; font-size: .9rem; }
+    input { width: 100%; border: 1px solid #ddd; border-radius: .65rem; padding: .8rem; font: inherit; background: white; }
+    input:focus { outline: 2px solid #111; outline-offset: 1px; }
+    .check { display: flex; align-items: center; gap: .6rem; }
+    .check input { width: auto; }
+    .muted { font-size: .88rem; color: #777; }
+    .error { padding: .8rem 1rem; background: #fff1f1; border-radius: .65rem; color: #8b1d1d; }
+    button { margin-top: 1rem; border: 0; border-radius: .7rem; padding: .95rem 1.2rem; background: #111; color: white; font: inherit; font-weight: 650; cursor: pointer; }
+    a { color: inherit; }
+    @media (max-width: 38rem) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <p><a href="/">Forfettario AI</a></p>
+    <h1>Genera AA9/12</h1>
+    <p>Inserisci i dati, scarica la bozza ufficiale già compilata, controllala e firmala tu.</p>
+
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+    <form method="post" action="/opening/aa912.pdf">
+      <h2>Attività</h2>
+      <div class="grid">
+        <label>Data inizio attività
+          <input type="date" name="start_date" required value="{{ values.get('start_date', '') }}">
+        </label>
+        <label>Codice ATECO
+          <input value="62.10.00 - Attività di programmazione informatica" disabled>
+        </label>
+      </div>
+
+      <h2>Dati personali</h2>
+      <label>Codice fiscale
+        <input name="fiscal_code" required maxlength="16" autocomplete="off" value="{{ values.get('fiscal_code', '') }}">
+      </label>
+      <div class="grid">
+        <label>Cognome
+          <input name="surname" required value="{{ values.get('surname', '') }}">
+        </label>
+        <label>Nome
+          <input name="given_name" required value="{{ values.get('given_name', '') }}">
+        </label>
+        <label>Data di nascita
+          <input type="date" name="birth_date" required value="{{ values.get('birth_date', '') }}">
+        </label>
+        <label>Comune di nascita
+          <input name="birth_municipality" required value="{{ values.get('birth_municipality', '') }}">
+        </label>
+        <label>Provincia di nascita
+          <input name="birth_province" maxlength="2" required value="{{ values.get('birth_province', '') }}">
+        </label>
+      </div>
+
+      <h2>Residenza</h2>
+      <label>Indirizzo completo
+        <input name="residence_address" required placeholder="Via Roma 10" value="{{ values.get('residence_address', '') }}">
+      </label>
+      <div class="grid">
+        <label>CAP
+          <input name="residence_postal_code" inputmode="numeric" maxlength="5" required value="{{ values.get('residence_postal_code', '') }}">
+        </label>
+        <label>Comune
+          <input name="residence_municipality" required value="{{ values.get('residence_municipality', '') }}">
+        </label>
+        <label>Provincia
+          <input name="residence_province" maxlength="2" required value="{{ values.get('residence_province', '') }}">
+        </label>
+      </div>
+
+      <h2>Luogo di attività</h2>
+      <label class="check">
+        <input type="checkbox" name="activity_at_residence" checked>
+        Lavoro normalmente dalla mia residenza
+      </label>
+      <p class="muted">Se lavori da un altro luogo, inseriscilo qui sotto. Questi campi vengono ignorati quando la casella sopra è selezionata.</p>
+      <label>Indirizzo attività
+        <input name="activity_address" value="{{ values.get('activity_address', '') }}">
+      </label>
+      <div class="grid">
+        <label>CAP attività
+          <input name="activity_postal_code" maxlength="5" value="{{ values.get('activity_postal_code', '') }}">
+        </label>
+        <label>Comune attività
+          <input name="activity_municipality" value="{{ values.get('activity_municipality', '') }}">
+        </label>
+        <label>Provincia attività
+          <input name="activity_province" maxlength="2" value="{{ values.get('activity_province', '') }}">
+        </label>
+      </div>
+      <label class="check">
+        <input type="checkbox" name="accounting_records_at_activity_address" checked>
+        Conservo la documentazione contabile/fiscale presso il luogo di attività
+      </label>
+
+      <h2>Firma</h2>
+      <label>Data della dichiarazione
+        <input type="date" name="declaration_date" value="{{ values.get('declaration_date', today) }}">
+      </label>
+      <p class="muted">La firma resta sempre vuota: l'app non firma mai al posto tuo.</p>
+
+      <button type="submit">Genera PDF AA9/12</button>
+    </form>
+  </main>
+</body>
+</html>
