@@ -41,12 +41,16 @@ steps automatically when asked to implement a change.
 6. Watch PR checks with `gh pr checks <number> --watch`. Fix failures caused by the
    change and push again. Report unrelated failures explicitly; never weaken
    checks to pass. Deliver the PR URL and actual validation results.
-7. Merge only when authorized by the user and all required checks pass, using
-   squash merge. Existing merge authorization does not require another question.
+7. Automatically squash-merge when the task is complete, all required checks pass
+   and review conversations are resolved, unless the user asks to hold the PR.
+   The user has granted standing authorization: do not ask again. Do not merge
+   an incomplete/draft PR just because CI passes. Deployment is a separate action.
    If `main` advanced, merge `origin/main` into the task branch and rerun checks;
    do not force-push. Never bypass protection with an admin merge.
-8. After merge, verify the remote result. Fast-forward a clean local `main` with
-   `git pull --ff-only`; leave a dirty checkout untouched. Remove task branches and
+8. After merge, verify the remote result. Fast-forward local `main` with
+   `git pull --ff-only`. If it contains local changes, first verify they do not
+   overlap incoming paths; otherwise leave that checkout untouched and report it.
+   Never stash or discard changes to make the update succeed. Remove task branches and
    worktrees only when merged and clean. Report any retained worktree.
 
 Authentication or network failures do not justify losing local work: finish what

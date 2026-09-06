@@ -13,8 +13,10 @@ again. A read-only investigation does not require a branch or PR.
 - Preserve unrelated local changes; use a separate worktree when needed.
 - Review the diff, run the required checks, update applicable documentation, and
   deliver a PR. Continue through CI failures attributable to the change.
-- Do not merge unless the user has authorized it; existing authorization carries
-  across turns. Never bypass branch protection or failing checks.
+- Automatically squash-merge the PR once the task is complete, required checks
+  pass and review conversations are resolved, unless the user asks to hold it.
+  This is standing authorization; do not ask again. Never bypass branch protection
+  or failing checks, and do not treat merge authorization as deployment authorization.
 - Report the PR URL, validation results and any concrete blocker. Do not claim
   remote operations succeeded without verifying them.
 
