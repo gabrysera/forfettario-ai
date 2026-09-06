@@ -15,6 +15,9 @@ If fiscal logic changed, list sources and applicable period.
 
 ## Tests
 
+List commands/checks actually run and their results. Mark inapplicable items as
+N/A with a short reason; distinguish updated manual tests from executed ones.
+
 - [ ] Unit/integration tests updated
 - [ ] Boundary tests updated where relevant
 - [ ] Golden fixture updated where relevant

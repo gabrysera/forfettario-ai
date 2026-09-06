@@ -2,6 +2,24 @@
 
 This file is authoritative for AI coding agents working in this repository.
 
+## Required delivery workflow
+
+For every implementation request, follow the GitHub Flow procedure in
+`CONTRIBUTING.md`. Read it before editing. The request authorizes branch/worktree
+creation, relevant checks, commits, push and PR creation/update without asking
+again. A read-only investigation does not require a branch or PR.
+
+- Create a task branch before editing; never implement or commit directly on `main`.
+- Preserve unrelated local changes; use a separate worktree when needed.
+- Review the diff, run the required checks, update applicable documentation, and
+  deliver a PR. Continue through CI failures attributable to the change.
+- Automatically squash-merge the PR once the task is complete, required checks
+  pass and review conversations are resolved, unless the user asks to hold it.
+  This is standing authorization; do not ask again. Never bypass branch protection
+  or failing checks, and do not treat merge authorization as deployment authorization.
+- Report the PR URL, validation results and any concrete blocker. Do not claim
+  remote operations succeeded without verifying them.
+
 ## Prime directive: code quality
 
 Code in this repository must be **MINIMAL, SUPER ELEGANT, MODULAR, and aligned with modern Python best practices**.
